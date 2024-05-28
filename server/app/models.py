@@ -30,6 +30,10 @@ class User(UserMixin, BaseModel):
     last_name = Column(String(80))
     phone = Column(String(10), nullable=True)
     role = Column(Enum(Role), default=Role.USER)
+    orders = relationship('Order', backref='user', lazy=True)
+    comments = relationship('Comment', backref='user', lazy=True)
+    ratings = relationship('Rating', backref='user', lazy=True)
+    likes = relationship('Like', backref='user', lazy=True)
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -77,7 +81,11 @@ class Course(BaseModel):
     instructor_id = Column(Integer, ForeignKey(Instructor.id), nullable=False)
     lessons = relationship('Lesson', backref='course', lazy=True)
     tags = relationship('Tag', secondary='course_tag', backref='courses')
-
+    details = relationship('OrderDetail', backref='course', lazy=True)
+    comments = relationship('Comment', backref='course', lazy=True)
+    ratings = relationship('Rating', backref='course', lazy=True)
+    likes = relationship('Like', backref='course', lazy=True)
+    
     def __str__(self):
         return self.subject
 
@@ -124,3 +132,53 @@ lesson_tag = db.Table('lesson_tag',
                       Column('tag_id', Integer, ForeignKey(
                           Tag.id), nullable=False)
                       )
+
+
+class Order(BaseModel):
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    details = relationship('OrderDetail', backref='order', lazy=True)
+
+    def __str__(self):
+        return self.user_id
+
+
+class OrderDetail(BaseModel):
+    quantity = Column(Integer, default=1)
+    unit_price = Column(Float, default=0.0)
+    course_id = Column(Integer, ForeignKey(Course.id), nullable=False)
+    order_id = Column(Integer, ForeignKey(Order.id), nullable=False)
+
+    def __str__(self):
+        return f'<Details "{self.quantity} * {self.unit_price}">'
+
+
+class InteractionModel(BaseModel):
+    __abstract__ = True
+
+    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    course_id = Column(Integer, ForeignKey(Course.id), nullable=False)
+
+
+class Comment(InteractionModel):
+    content = Column(Text)
+
+    def __str__(self):
+        return self.content[:20]
+
+
+class Rating(InteractionModel):
+    rate = Column(Integer, default=0)
+
+    def __str__(self):
+        return self.rate
+
+
+class Like(db.Model):
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    course_id = Column(Integer, ForeignKey(Course.id), nullable=False)
+    liked = Column(Boolean, default=False)
+    date_created = Column(DateTime, default=datetime.utcnow())
+    
+    def __str__(self):
+        return self.liked

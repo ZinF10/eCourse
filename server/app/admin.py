@@ -6,8 +6,8 @@ from flask_admin.contrib.fileadmin import FileAdmin
 from flask_login import current_user, logout_user, login_required
 from flask_babel import Babel, gettext
 from flask_admin.actions import action
-from app import app, db
-from .models import Category, Course, Tag, Lesson, User, Instructor, Student, Resource
+from app import app, db, dao
+from .models import Category, Course, Tag, Lesson, User, Instructor, Student, Resource, Order, Like, Rating, Comment, OrderDetail
 
 
 class BaseModelView(ModelView):
@@ -37,7 +37,8 @@ class ActionsView(BaseModelView):
             db.session.commit()
             flash(gettext('Successfully to change active.'), category='success')
         except Exception as e:
-            flash(gettext(f'Failed to change activate. {str(e)}'), category='error')
+            flash(gettext(f'Failed to change activate. {
+                  str(e)}'), category='error')
 
 
 class UserView(ActionsView):
@@ -74,14 +75,14 @@ class CategoryView(ActionsView):
 
 
 class CourseView(ActionsView):
-    column_list = ["subject", "price", "category", "instructor",
-                   "lessons", "tags"] + ActionsView.column_list
+    column_list = ["subject", "price", "category",
+                   "tags"] + ActionsView.column_list
     inline_models = [Lesson, Tag]
     column_searchable_list = ["subject"]
-    column_editable_list = ["subject", "category", "instructor", "lessons", "tags"] + \
+    column_editable_list = ["subject", "price", "category", "tags"] + \
         ActionsView.column_editable_list
-    column_sortable_list = ["subject", "category",
-                            "instructor"] + ActionsView.column_sortable_list
+    column_sortable_list = ["subject", "price", "category"] + \
+        ActionsView.column_sortable_list
     column_filters = ["price"] + ActionsView.column_filters
 
 
@@ -112,7 +113,55 @@ class ResourceView(ActionsView):
         ActionsView.column_sortable_list
 
 
+class OrderView(ActionsView):
+    column_list = ["user", "details"] + ActionsView.column_list
+    column_editable_list = ["user"] + \
+        ActionsView.column_editable_list
+    column_sortable_list = ["user"] + \
+        ActionsView.column_sortable_list
+
+
+class OrderDetailView(ActionsView):
+    column_list = ["order", "course"] + ActionsView.column_list
+    column_editable_list = ["order", "course"] + \
+        ActionsView.column_editable_list
+    column_sortable_list = ["order", "course"] + \
+        ActionsView.column_sortable_list
+
+
+class CommentView(ActionsView):
+    column_list = ["user", "course", "content"] + ActionsView.column_list
+    column_editable_list = ["user", "course", "content"] + \
+        ActionsView.column_editable_list
+    column_sortable_list = ["user", "course", "content"] + \
+        ActionsView.column_sortable_list
+
+
+class RatingView(ActionsView):
+    column_list = ["user", "course", "rate"] + ActionsView.column_list
+    column_editable_list = ["user", "course", "rate"] + \
+        ActionsView.column_editable_list
+    column_sortable_list = ["user", "course", "rate"] + \
+        ActionsView.column_sortable_list
+
+
+class LikeView(BaseModelView):
+    column_list = ["user", "course", "liked", "date_created"]
+    column_editable_list = ["user", "course", "liked", "date_created"]
+    column_sortable_list = ["user", "course", "liked", "date_created"]
+    column_filters = ["liked", "date_created"]
+
+
 class UploadFileView(FileAdmin):
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.is_admin()
+
+
+class AnalyticsView(BaseView):
+    @expose("/")
+    def index(self):
+        return self.render("admin/analytics.html")
+
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin()
 
@@ -120,7 +169,7 @@ class UploadFileView(FileAdmin):
 class AdminView(AdminIndexView):
     @expose('/')
     def index(self):
-        return self.render('admin/index.html')
+        return self.render('admin/index.html', categories=dao.stats_courses())
 
 
 class LogoutView(BaseView):
@@ -159,6 +208,14 @@ admin.add_view(CourseView(Course, db.session, category="Management"))
 admin.add_view(LessonView(Lesson, db.session, category="Management"))
 admin.add_view(ResourceView(Resource, db.session, category="Management"))
 admin.add_view(TagView(Tag, db.session, category="Management"))
+admin.add_view(OrderView(Order, db.session, category="Management"))
+admin.add_view(OrderDetailView(OrderDetail, db.session, category="Management"))
+admin.add_view(CommentView(Comment, db.session, category="Management"))
+admin.add_view(RatingView(Rating, db.session, category="Management"))
+admin.add_view(LikeView(Like, db.session, category="Management"))
+admin.add_view(AnalyticsView(name="Analytics & Statistics",
+               endpoint="analytics-statistics"))
 admin.add_view(UploadFileView(path, "/static/", name="Files",
-               category="Settings", url="upload-file"))
-admin.add_view(LogoutView(name="Log Out", category="Settings", url="logout"))
+               category="Settings", endpoint="upload-file"))
+admin.add_view(LogoutView(
+    name="Log Out", category="Settings", endpoint="logout"))

@@ -1,7 +1,7 @@
 {% extends 'admin/master.html' %}
 <div class="container mt-4">
 	{% block body %} {% if current_user.is_authenticated and
-	current_user.is_admin() %} 
+	current_user.is_admin() %}
 	<div class="jumbotron">
 		<h1 class="display-5">
 			Welcome to eStory Administrator Dashboard
@@ -13,11 +13,41 @@
 		<p>Use the navigation bar to access different sections.</p>
 		<a
 			class="btn btn-primary"
-			href="{{ url_for('admin.index') }}"
+			href="{{ url_for('analytics-statistics.index') }}"
 			role="button"
 			>Go to Statistics Dashboard</a
 		>
 	</div>
+
+	<div class="row">
+		<div class="col-md-6">
+			<canvas id="statsCourseChart"></canvas>
+		</div>
+		<div class="col-md-6">
+			<canvas id="statsOrderChart"></canvas>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+	<script>
+		const labels = [], data = [], backgroundColor = [], borderColor = [];
+
+		{% for c in categories %}
+		labels.push('{{c[1]}}')
+		data.push({{ c[2]}})
+		{% endfor %}
+
+		window.onload = () => {
+			for (let i = 0; i < labels.length; i++) {
+				backgroundColor.push(generateRandomColor());
+				borderColor.push(generateRandomColor(0));
+			}
+
+			const newCtx = document.getElementById('statsCourseChart').getContext('2d');
+			loadChart(newCtx, "bar", labels, "Statistical of the number of courses by category", "Amount", data, backgroundColor, borderColor)
+		}
+	</script>
 	{% else %}
 	<div class="d-flex justify-content-center">
 		<div class="col-md-6 mt-4">
