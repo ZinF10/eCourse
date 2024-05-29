@@ -9,7 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 class Role(enum.Enum):
     ADMIN = 'Administrator'
-    USER = 'User'
+    STUDENT = 'Student'
     INSTRUCTOR = 'Instructor'
 
 
@@ -29,7 +29,7 @@ class User(UserMixin, BaseModel):
     first_name = Column(String(80))
     last_name = Column(String(80))
     phone = Column(String(10), nullable=True)
-    role = Column(Enum(Role), default=Role.USER)
+    role = Column(Enum(Role), default=Role.STUDENT)
     orders = relationship('Order', backref='user', lazy=True)
     comments = relationship('Comment', backref='user', lazy=True)
     ratings = relationship('Rating', backref='user', lazy=True)
@@ -56,14 +56,6 @@ class Instructor(db.Model):
     courses = relationship('Course', backref='instructor', lazy=True)
 
 
-class Student(db.Model):
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey(User.id), unique=True, nullable=False)
-    user = relationship(User, backref='student', uselist=False)
-    address = Column(String(125), nullable=True)
-    date_of_birth = Column(Date)
-
-
 class Category(BaseModel):
     name = Column(String(80), unique=True)
     courses = relationship('Course', backref='category', lazy=True)
@@ -85,7 +77,7 @@ class Course(BaseModel):
     comments = relationship('Comment', backref='course', lazy=True)
     ratings = relationship('Rating', backref='course', lazy=True)
     likes = relationship('Like', backref='course', lazy=True)
-    
+
     def __str__(self):
         return self.subject
 
@@ -179,6 +171,6 @@ class Like(db.Model):
     course_id = Column(Integer, ForeignKey(Course.id), nullable=False)
     liked = Column(Boolean, default=False)
     date_created = Column(DateTime, default=datetime.utcnow())
-    
+
     def __str__(self):
         return self.liked

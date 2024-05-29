@@ -7,7 +7,7 @@ from flask_login import current_user, logout_user, login_required
 from flask_babel import Babel, gettext
 from flask_admin.actions import action
 from app import app, db, dao
-from .models import Category, Course, Tag, Lesson, User, Instructor, Student, Resource, Order, Like, Rating, Comment, OrderDetail
+from .models import Category, Course, Tag, Lesson, User, Instructor, Resource, Order, Like, Rating, Comment, OrderDetail
 
 
 class BaseModelView(ModelView):
@@ -54,13 +54,6 @@ class UserView(ActionsView):
 class InstructorView(BaseModelView):
     column_list = ["user", "bio"]
     column_filters = ["user"]
-    column_editable_list = ["user"]
-    column_sortable_list = ["user"]
-
-
-class StudentView(BaseModelView):
-    column_list = ["user", "date_of_birth", "address"]
-    column_filters = ["user", "date_of_birth"]
     column_editable_list = ["user"]
     column_sortable_list = ["user"]
 
@@ -202,7 +195,6 @@ admin = Admin(app, name="eCourse", template_mode="bootstrap4",
 
 admin.add_view(UserView(User, db.session, category="Management"))
 admin.add_view(InstructorView(Instructor, db.session, category="Management"))
-admin.add_view(StudentView(Student, db.session, category="Management"))
 admin.add_view(CategoryView(Category, db.session, category="Management"))
 admin.add_view(CourseView(Course, db.session, category="Management"))
 admin.add_view(LessonView(Lesson, db.session, category="Management"))

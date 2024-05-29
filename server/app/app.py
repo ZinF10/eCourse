@@ -1,16 +1,11 @@
-from app import app, admin, login_manager, dao
-from flask_login import login_user, current_user
+from app import app, resources, admin, login_manager, dao
+from flask_login import login_user
 from flask import flash, redirect, request
 
 
 @login_manager.user_loader
 def load_user(user_id):
     return dao.load_user(id=user_id)
-
-
-@app.get('/')
-def index():
-    return app.send_static_file('data/categories.json')
 
 
 @app.route("/admin-login", methods=['POST'])
