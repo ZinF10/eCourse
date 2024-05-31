@@ -1,44 +1,8 @@
-from flask_restx import fields, reqparse
-from flask_restx import Resource, Namespace
-from werkzeug.datastructures import FileStorage
+from flask_restx import Resource
 from flask import abort, request
-from datetime import datetime
 from app import dao, schemas, api, utils
-
-category_ns = Namespace(
-    name='categories',
-    description='Operations related to categories'
-)
-course_ns = Namespace(
-    name='courses',
-    description='Operations related to courses'
-)
-lesson_ns = Namespace(
-    name='lessons',
-    description='Operations related to lessons'
-)
-user_ns = Namespace(
-    name='users',
-    description='Operations related to users'
-)
-
-user_model = user_ns.model('User', {
-    'username': fields.String(required=True, description='The username'),
-    'email': fields.String(required=True, description='The email'),
-    'password': fields.String(required=True, description='The password'),
-    'first_name': fields.String(required=True, description='The first name'),
-    'last_name': fields.String(required=True, description='The last name'),
-    'avatar': fields.String(required=False, description='The avatar')
-})
-
-user_parser = reqparse.RequestParser()
-user_parser.add_argument('username', type=str, required=True)
-user_parser.add_argument('email', type=str, required=True)
-user_parser.add_argument('password', type=str, required=True)
-user_parser.add_argument('first_name', type=str, required=True)
-user_parser.add_argument('last_name', type=str, required=True)
-user_parser.add_argument('avatar', location='files',
-                         type=FileStorage, required=False)
+from flask_jwt_extended import jwt_required, current_user
+from .modules import category_ns, course_ns, lesson_ns, user_ns, user_parser
 
 
 @category_ns.route('/')
@@ -61,7 +25,6 @@ class CourseDetail(Resource):
         course = dao.load_course(course_id=id)
         if not course:
             abort(404, description="Not found")
-
         return schemas.CourseDetailSchema().dump(course), 200
 
 
@@ -78,7 +41,6 @@ class LessonDetail(Resource):
         lesson = dao.load_lesson(lesson_id=id)
         if not lesson:
             abort(404, description="Not found")
-
         return schemas.LessonDetailSchema().dump(lesson), 200
 
 
@@ -112,6 +74,13 @@ class User(Resource):
             return schemas.UserSchema().dump(user), 201
         except Exception as e:
             return {'error': str(e)}, 500
+
+
+@user_ns.route('/current-user/')
+class CurrentUser(Resource):
+    @jwt_required()
+    def get(self):
+        return schemas.CurrentUserSchema().dump(current_user), 200
 
 
 api.add_namespace(user_ns)

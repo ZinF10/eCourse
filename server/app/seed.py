@@ -1,5 +1,5 @@
 from app import db
-from .models import User, Instructor, Student, Category, Course, Role
+from .models import User, Instructor, Category, Course, Role
 
 
 def create_data():

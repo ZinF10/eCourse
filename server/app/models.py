@@ -1,6 +1,6 @@
 import enum
 from app import db
-from sqlalchemy import Column, Integer, Boolean, DateTime, String, ForeignKey, Text, Float, Enum, Date
+from sqlalchemy import Column, Integer, Boolean, DateTime, String, ForeignKey, Text, Float, Enum
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin
 from datetime import datetime
@@ -43,6 +43,9 @@ class User(UserMixin, BaseModel):
 
     def is_admin(self):
         return self.role == Role.ADMIN
+
+    def get_user_id(self):
+        return self.id
 
     def __str__(self):
         return self.username

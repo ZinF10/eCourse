@@ -3,23 +3,28 @@ from flask import session, request, g, redirect, flash
 from flask_admin import Admin, expose, AdminIndexView, BaseView
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.fileadmin import FileAdmin
-from flask_login import current_user, logout_user, login_required
+from flask_login import current_user, logout_user
 from flask_babel import Babel, gettext
 from flask_admin.actions import action
-from app import app, db, dao
+from app import app, db, dao, decorators
 from .models import Category, Course, Tag, Lesson, User, Instructor, Resource, Order, Like, Rating, Comment, OrderDetail
+
+
+class AuthenticatedView(BaseView):
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.is_admin()
 
 
 class BaseModelView(ModelView):
     column_list = ["active", "date_created"]
     column_filters = ["active", "date_created"]
+    column_editable_list = ["active"]
+    column_sortable_list = ["date_created"]
     create_modal = True
     edit_modal = True
     can_view_details = True
     can_export = True
     page_size = 10
-    column_editable_list = ["active"]
-    column_sortable_list = ["date_created"]
 
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin()
@@ -145,18 +150,14 @@ class LikeView(BaseModelView):
     column_filters = ["liked", "date_created"]
 
 
-class UploadFileView(FileAdmin):
-    def is_accessible(self):
-        return current_user.is_authenticated and current_user.is_admin()
+class UploadFileView(FileAdmin, AuthenticatedView):
+    pass
 
 
-class AnalyticsView(BaseView):
+class AnalyticsView(AuthenticatedView):
     @expose("/")
     def index(self):
         return self.render("admin/analytics.html")
-
-    def is_accessible(self):
-        return current_user.is_authenticated and current_user.is_admin()
 
 
 class AdminView(AdminIndexView):
@@ -165,15 +166,12 @@ class AdminView(AdminIndexView):
         return self.render('admin/index.html', categories=dao.stats_courses())
 
 
-class LogoutView(BaseView):
-    @login_required
+class LogoutView(AuthenticatedView):
+    @decorators.admin_member_required
     @expose('/')
     def index(self):
         logout_user()
         return redirect('/admin')
-
-    def is_accessible(self):
-        return current_user.is_authenticated
 
 
 def get_locale():

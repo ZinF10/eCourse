@@ -3,6 +3,10 @@ from .models import User, Category, Course, Lesson
 from sqlalchemy import func
 
 
+def get_user(email):
+    return User.query.filter_by(email=email).one_or_none()
+
+
 def load_users():
     return User.query.filter(User.active.__eq__(True)).all()
 

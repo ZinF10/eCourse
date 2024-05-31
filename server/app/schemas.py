@@ -63,3 +63,16 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
         db.session.add_all(user)
         db.session.commit()
         return user
+
+
+class EnumField(fields.Field):
+    def _serialize(self, value, attr, obj, **kwargs):
+        return value.name
+
+
+class CurrentUserSchema(UserSchema):
+    role = EnumField(attribute="role")
+
+    class Meta:
+        model = UserSchema.Meta.model
+        fields = UserSchema.Meta.fields + ['phone', 'role']

@@ -19,3 +19,4 @@ class Config:
         api_key=os.environ.get('API_KEY'),
         api_secret=os.environ.get('API_SECRET')
     )
+    JWT_SECRET_KEY = os.environ.get('SECRET_KEY')
