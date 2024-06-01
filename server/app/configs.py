@@ -3,14 +3,20 @@ import cloudinary
 from dotenv import load_dotenv
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+DB_USERNAME = os.environ.get('DB_USERNAME')
+DB_PASSWORD = os.environ.get('DB_PASSWORD')
+DB_HOST = os.environ.get('DB_HOST')
 
 
 class Config:
     load_dotenv()
 
     SECRET_KEY = os.environ.get('SECRET_KEY')
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + \
-        os.path.join(BASE_DIR, 'database', 'ecourse.sqlite3')
+    # SQLALCHEMY_DATABASE_URI = 'sqlite:///' + \
+    #     os.path.join(BASE_DIR, 'database', 'ecourse.sqlite3')
+    SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{DB_USERNAME}:{
+        DB_PASSWORD}@{DB_HOST}/ecourse?charset=utf8mb4'
+
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     FLASK_ADMIN_SWATCH = 'lux'
 

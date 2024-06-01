@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: c6ebb19e3bc2
+Revision ID: 2d914ceba3da
 Revises: 
-Create Date: 2024-05-30 18:54:24.864606
+Create Date: 2024-06-01 22:41:44.839514
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c6ebb19e3bc2'
+revision = '2d914ceba3da'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -50,20 +50,6 @@ def upgrade():
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
     )
-    op.create_table('client',
-    sa.Column('name', sa.String(length=40), nullable=True),
-    sa.Column('description', sa.String(length=400), nullable=True),
-    sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.Column('client_id', sa.String(length=40), nullable=False),
-    sa.Column('client_secret', sa.String(length=55), nullable=False),
-    sa.Column('confidential', sa.Boolean(), nullable=True),
-    sa.Column('_redirect_uris', sa.Text(), nullable=True),
-    sa.Column('_default_scopes', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('client_id'),
-    sa.UniqueConstraint('client_secret'),
-    sa.UniqueConstraint('name')
-    )
     op.create_table('instructor',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
@@ -94,36 +80,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['instructor_id'], ['instructor.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('subject')
-    )
-    op.create_table('grant',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.Column('client_id', sa.String(length=40), nullable=False),
-    sa.Column('code', sa.String(length=255), nullable=False),
-    sa.Column('redirect_uri', sa.String(length=255), nullable=True),
-    sa.Column('expires', sa.DateTime(), nullable=True),
-    sa.Column('_scopes', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['client_id'], ['client.client_id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
-    )
-    with op.batch_alter_table('grant', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_grant_code'), ['code'], unique=False)
-
-    op.create_table('token',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('client_id', sa.String(length=40), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.Column('token_type', sa.String(length=40), nullable=True),
-    sa.Column('access_token', sa.String(length=255), nullable=True),
-    sa.Column('refresh_token', sa.String(length=255), nullable=True),
-    sa.Column('expires', sa.DateTime(), nullable=True),
-    sa.Column('_scopes', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['client_id'], ['client.client_id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('access_token'),
-    sa.UniqueConstraint('refresh_token')
     )
     op.create_table('comment',
     sa.Column('content', sa.Text(), nullable=True),
@@ -217,15 +173,9 @@ def downgrade():
     op.drop_table('lesson')
     op.drop_table('course_tag')
     op.drop_table('comment')
-    op.drop_table('token')
-    with op.batch_alter_table('grant', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_grant_code'))
-
-    op.drop_table('grant')
     op.drop_table('course')
     op.drop_table('order')
     op.drop_table('instructor')
-    op.drop_table('client')
     op.drop_table('user')
     op.drop_table('tag')
     op.drop_table('category')
