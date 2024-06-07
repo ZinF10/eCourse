@@ -25,7 +25,7 @@ class User(UserMixin, BaseModel):
     avatar = Column(String(225), default=None)
     username = Column(String(80), unique=True)
     email = Column(String(125), unique=True)
-    password = Column(String(100))
+    password = Column(String(255))
     first_name = Column(String(80))
     last_name = Column(String(80))
     phone = Column(String(10), nullable=True)
@@ -51,8 +51,7 @@ class User(UserMixin, BaseModel):
         return self.username
 
 
-class Instructor(db.Model):
-    id = Column(Integer, primary_key=True, autoincrement=True)
+class Instructor(BaseModel):
     user_id = Column(Integer, ForeignKey(User.id), unique=True, nullable=False)
     bio = Column(Text, nullable=True)
     user = relationship(User, backref='instructor', uselist=False)
