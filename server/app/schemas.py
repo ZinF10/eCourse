@@ -16,12 +16,14 @@ class TagSchema(ma.SQLAlchemyAutoSchema):
 
 
 class CourseSchema(ma.SQLAlchemyAutoSchema):
-    category = ma.Function(lambda obj: obj.category.name)
+    category = fields.Function(lambda obj: obj.category.name)
 
     class Meta:
         model = Course
         fields = ['id', 'subject', 'image',
                   'price', 'category', 'date_created']
+        load_instance = True
+        include_fk = True
 
 
 class CourseDetailSchema(CourseSchema):
@@ -36,7 +38,7 @@ class LessonSchema(ma.SQLAlchemyAutoSchema):
     course = ma.Function(lambda obj: obj.course.subject)
 
     class Meta:
-        model = Course
+        model = Lesson
         fields = ['id', 'title', 'image', 'course', 'date_created']
 
 
@@ -60,7 +62,7 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
     def make_user(self, data, **kwargs):
         user = User(**data)
         user.set_password(data["password"])
-        db.session.add_all(user)
+        db.session.add(user)
         db.session.commit()
         return user
 

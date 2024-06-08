@@ -14,9 +14,43 @@ class Category(Resource):
 
 @course_ns.route('/')
 class Course(Resource):
+    @course_ns.doc(params={
+        'keyword': 'Search keyword',
+        'max_price': 'Maximum price',
+        'min_price': 'Minimum price',
+        'release_month': 'Filter by release month (1-12)',
+        'release_month_after': 'Filter courses released after this month (1-12)',
+        'release_month_before': 'Filter courses released before this month (1-12)',
+        'latest': 'Filter by latest products (true/false)',
+        'page': 'Page number',
+        'category': 'Filter category id',
+    })
     def get(self):
+        category = request.args.get('category', type=int)
+        keyword = request.args.get('keyword', type=str)
+        from_price = request.args.get('min_price', type=float)
+        to_price = request.args.get('max_price', type=float)
+        release_month = request.args.get('release_month', type=int)
+        release_month_after = request.args.get('release_month_after', type=int)
+        release_month_before = request.args.get(
+            'release_month_before', type=int)
+        is_latest = request.args.get('latest', type=bool, default=False)
+        page = request.args.get('page', type=int, default=1)
+
+        courses = dao.load_courses(
+            category=category,
+            keyword=keyword,
+            from_price=from_price,
+            to_price=to_price,
+            release_month=release_month,
+            release_month_after=release_month_after,
+            release_month_before=release_month_before,
+            is_latest=is_latest,
+            page=page
+        )
+
         schema = schemas.CourseSchema(many=True)
-        return schema.dump(dao.load_courses()), 200
+        return schema.dump(courses['courses']), 200
 
 
 @course_ns.route('/<int:id>')
@@ -48,32 +82,29 @@ class LessonDetail(Resource):
 class User(Resource):
     @user_ns.expect(user_parser)
     def post(self):
-        try:
-            data = user_parser.parse_args()
-            username = data.get('username')
-            email = data.get('email')
-            password = data.get('password')
-            first_name = data.get('first_name')
-            last_name = data.get('last_name')
-            avatar = request.files.get('avatar')
+        data = user_parser.parse_args()
+        username = data.get('username')
+        email = data.get('email')
+        password = data.get('password')
+        first_name = data.get('first_name')
+        last_name = data.get('last_name')
+        avatar = request.files.get('avatar')
 
-            if not all([username, email, password, first_name, last_name]):
-                return {'message': 'Missing required fields'}, 400
+        if not all([username, email, password, first_name, last_name]):
+            return {'message': 'Missing required fields'}, 400
 
-            if dao.exist_user(email=email):
-                return {'message': 'Email already exists'}, 400
+        if dao.exist_user(email=email):
+            return {'message': 'Email already exists'}, 400
 
-            if dao.exist_user(username=username):
-                return {'message': 'Username already exists'}, 400
+        if dao.exist_user(username=username):
+            return {'message': 'Username already exists'}, 400
 
-            avatar_url = utils.upload_image(avatar)
-            data['avatar'] = avatar_url
+        avatar_url = utils.upload_image(avatar)
+        data['avatar'] = avatar_url
 
-            user = schemas.UserSchema().load(data)
+        user = schemas.UserSchema().load(data)
 
-            return schemas.UserSchema().dump(user), 201
-        except Exception as e:
-            return {'error': str(e)}, 500
+        return schemas.UserSchema().dump(user), 201
 
 
 @user_ns.route('/current-user/')

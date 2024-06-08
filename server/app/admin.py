@@ -1,13 +1,30 @@
+import os
 import os.path as op
-from flask import session, request, g, redirect, flash
-from flask_admin import Admin, expose, AdminIndexView, BaseView
+from flask import session, request, g, redirect, flash, url_for
+from flask_admin import Admin, expose, AdminIndexView, BaseView, form
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.fileadmin import FileAdmin
 from flask_login import current_user, logout_user
+from flask_admin.form.upload import ImageUploadField
+from markupsafe import Markup
 from flask_babel import Babel, gettext
 from flask_admin.actions import action
 from app import app, db, dao, decorators
-from .models import Category, Course, Tag, Lesson, User, Instructor, Resource, Order, Like, Rating, Comment, OrderDetail
+from .models import (
+    Category, Course, Tag, Lesson, User, Instructor,
+    Resource, Order, Like, Rating, Comment, OrderDetail
+)
+
+
+path = op.join(op.dirname(__file__), "static")
+images_path = op.join(op.dirname(__file__),
+                      f"static/uploads/images/")
+
+try:
+    os.mkdir(path)
+    os.mkdir(images_path)
+except OSError:
+    pass
 
 
 class AuthenticatedView(BaseView):
@@ -54,7 +71,7 @@ class UserView(ActionsView):
     column_sortable_list = ["username", "email"] + \
         ActionsView.column_sortable_list
     column_filters = ["role"] + ActionsView.column_filters
-
+    
 
 class InstructorView(BaseModelView):
     column_list = ["user", "bio"]
@@ -72,14 +89,31 @@ class CategoryView(ActionsView):
     column_sortable_list = ["name"] + ActionsView.column_sortable_list
 
 
-class CourseView(ActionsView):
-    column_list = ["subject", "price", "category",
+class ImageView(ModelView):
+    def _list_thumbnail(view, context, model, name):
+        if not model.image:
+            return '-Empty-'
+        return Markup(f'<img src="{url_for('static', filename=f"uploads/images/{form.thumbgen_filename(model.image)}")}" alt="{model.subject}" width="80" height="80" class="img-thumbnail rounded-circle shadow" />')
+
+    column_formatters = {
+        'image': _list_thumbnail
+    }
+
+    form_extra_fields = {
+        'image': ImageUploadField('Image',
+                                  base_path=images_path,
+                                  thumbnail_size=(100, 100, True)
+                                )
+    }
+
+class CourseView(ActionsView, ImageView):
+    column_list = ["subject", "image", "price", "category",
                    "tags"] + ActionsView.column_list
     inline_models = [Lesson, Tag]
     column_searchable_list = ["subject"]
     column_editable_list = ["subject", "price", "category", "tags"] + \
         ActionsView.column_editable_list
-    column_sortable_list = ["subject", "price", "category"] + \
+    column_sortable_list = ["subject", "price"] + \
         ActionsView.column_sortable_list
     column_filters = ["price"] + ActionsView.column_filters
 
@@ -186,7 +220,6 @@ def get_timezone():
         return user.timezone
 
 
-path = op.join(op.dirname(__file__), "static")
 babel = Babel(app, locale_selector=get_locale, timezone_selector=get_timezone)
 admin = Admin(app, name="eCourse", template_mode="bootstrap4",
               index_view=AdminView())

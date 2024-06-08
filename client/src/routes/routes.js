@@ -1,4 +1,6 @@
 import About from '@/pages/About';
+import CourseDetail from '@/pages/CourseDetail';
+import Courses from '@/pages/Courses';
 import Home from '@/pages/Home';
 import LogIn from '@/pages/LogIn';
 import Register from '@/pages/Register';
@@ -25,6 +27,16 @@ const routes = [
 		path: '/register',
 		component: Register,
 		lazy: () => import('@/pages/Register'),
+	},
+	{
+		path: '/courses',
+		component: Courses,
+		lazy: () => import('@/pages/Courses'),
+	},
+	{
+		path: '/courses/:id',
+		component: CourseDetail,
+		lazy: () => import('@/pages/CourseDetail'),
 	},
 ];
 

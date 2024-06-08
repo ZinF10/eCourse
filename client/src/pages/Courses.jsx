@@ -2,10 +2,16 @@ import { Each } from '@/components/common/Each';
 import { Loading } from '@/components/common/Loading';
 import useFetch from '@/hooks/useFetch';
 import endpoints from '@/services/endpoints';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
-const Home = () => {
-	const { data, isLoading, error } = useFetch(endpoints['courses']());
+const Courses = () => {
+	const location = useLocation();
+	const queryParams = new URLSearchParams(location.search);
+	const category = queryParams.get('category');
+	const keyword = queryParams.get('keyword');
+	const { data, isLoading, error } = useFetch(
+		endpoints['courses'](keyword, category),
+	);
 
 	if (isLoading) {
 		return <Loading />;
@@ -17,15 +23,14 @@ const Home = () => {
 
 	return (
 		<section>
-			<h1>Home</h1>
+			<h1>Courses</h1>
 
-			{data ? (
+			{data && data.length > 0 ? (
 				<Each
 					of={data}
 					render={(item, index) => (
 						<li key={index}>
-							<Link
-								to={`courses/${item.id}`}>
+							<Link to={`${item.id}`}>
 								{item.subject}
 							</Link>
 							<p>
@@ -50,4 +55,4 @@ const Home = () => {
 	);
 };
 
-export default Home;
+export default Courses;

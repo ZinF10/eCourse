@@ -8,7 +8,7 @@ DB_PASSWORD = os.environ.get('DB_PASSWORD')
 DB_HOST = os.environ.get('DB_HOST')
 
 
-class Config:
+class Config(object):
     load_dotenv()
 
     SECRET_KEY = os.environ.get('SECRET_KEY')
@@ -26,3 +26,4 @@ class Config:
         api_secret=os.environ.get('API_SECRET')
     )
     JWT_SECRET_KEY = os.environ.get('SECRET_KEY')
+    PAGE_SIZE = 10
