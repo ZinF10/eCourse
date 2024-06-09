@@ -5,11 +5,12 @@ from flask_login import LoginManager
 from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
+from flask_debugtoolbar import DebugToolbarExtension
 from app import configs
 from .api import Api
 
 app = Flask(__name__)
-app.config.from_object(configs.Config)
+app.config.from_object(configs.LocalConfig)
 CORS(app=app, resources={r"/*": {"origins": "*"}})
 jwt = JWTManager(app=app)
 api = Api(
@@ -27,6 +28,8 @@ ma = Marshmallow(app)
 db = SQLAlchemy(app=app)
 migrate = Migrate(app=app, db=db)
 login_manager = LoginManager(app=app)
+
+toolbar = DebugToolbarExtension(app=app)
 
 with app.app_context():
     from app import models

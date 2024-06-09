@@ -22,8 +22,6 @@ class CourseSchema(ma.SQLAlchemyAutoSchema):
         model = Course
         fields = ['id', 'subject', 'image',
                   'price', 'category', 'date_created']
-        load_instance = True
-        include_fk = True
 
 
 class CourseDetailSchema(CourseSchema):

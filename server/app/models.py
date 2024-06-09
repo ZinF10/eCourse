@@ -44,11 +44,8 @@ class User(UserMixin, BaseModel):
     def is_admin(self):
         return self.role == Role.ADMIN
 
-    def get_user_id(self):
-        return self.id
-
     def __str__(self):
-        return self.username
+        return f'{self.last_name} {self.first_name}'
 
 
 class Instructor(BaseModel):
@@ -56,6 +53,9 @@ class Instructor(BaseModel):
     bio = Column(Text, nullable=True)
     user = relationship(User, backref='instructor', uselist=False)
     courses = relationship('Course', backref='instructor', lazy=True)
+
+    def __str__(self):
+        return f'{self.user.last_name} {self.user.first_name}'
 
 
 class Category(BaseModel):

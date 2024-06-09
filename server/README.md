@@ -54,6 +54,18 @@ Then you can apply the changes described by the migration script to your databas
 flask db upgrade
 ```
 
+File `.env`
+
+```bash
+SECRET_KEY=<secret_key>
+CLOUD_NAME=<cloud_name>
+API_KEY=<api_key>
+API_SECRET=<api_secret>
+DB_USERNAME=<username>
+DB_PASSWORD=<password>
+DB_HOST=<host>
+```
+
 ## Author
 
 Copyright &copy; 2024 by [ZIN](http://www.github.com/zinitdev)

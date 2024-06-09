@@ -27,3 +27,13 @@ class Config(object):
     )
     JWT_SECRET_KEY = os.environ.get('SECRET_KEY')
     PAGE_SIZE = 10
+
+
+class LocalConfig(Config):
+    DEBUG = True
+    DEBUG_TB_INTERCEPT_REDIRECTS = False
+    SQLALCHEMY_RECORD_QUERIES = True
+
+
+class ProductionConfig(Config):
+    DEBUG = False

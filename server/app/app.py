@@ -2,7 +2,6 @@ from app import app, resources, admin, login_manager, dao, jwt
 from flask import flash, redirect, request, jsonify
 from flask_login import login_user
 from flask_jwt_extended import create_access_token
-from .models import User
 
 
 @login_manager.user_loader
@@ -40,7 +39,7 @@ def get_token():
     email = request.json.get("email")
     password = request.json.get("password")
 
-    user = dao.get_user(email=email)
+    user = dao.load_user(email=email)
     if not user or not user.check_password(password=password):
         return jsonify(message="Wrong email or password"), 401
 

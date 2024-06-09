@@ -1,4 +1,4 @@
-import { CATEGORIES_API, COURSES_API } from '@/constants/constants';
+import { CATEGORIES_API, COURSES_API, REGISTER_API } from '@/constants/constants';
 
 const endpoints = {
 	categories: CATEGORIES_API,
@@ -13,6 +13,7 @@ const endpoints = {
 		return url;
 	},
 	course_detail: (id) => `${COURSES_API}${id}`,
+	register: REGISTER_API,
 };
 
 export default endpoints;

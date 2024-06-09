@@ -93,19 +93,20 @@ class User(Resource):
         if not all([username, email, password, first_name, last_name]):
             return {'message': 'Missing required fields'}, 400
 
-        if dao.exist_user(email=email):
+        if dao.load_user(email=email):
             return {'message': 'Email already exists'}, 400
 
-        if dao.exist_user(username=username):
+        if dao.load_user(username=username):
             return {'message': 'Username already exists'}, 400
 
         avatar_url = utils.upload_image(avatar)
         data['avatar'] = avatar_url
 
-        user = schemas.UserSchema().load(data)
+        user_schema = schemas.UserSchema()
+        user = user_schema.load(data)
 
-        return schemas.UserSchema().dump(user), 201
-
+        return user_schema.dump(user), 201
+            
 
 @user_ns.route('/current-user/')
 class CurrentUser(Resource):

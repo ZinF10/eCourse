@@ -3,17 +3,19 @@ from .configs import Config
 from .models import User, Category, Course, Lesson
 from sqlalchemy import func, extract
 
+def load_user(id=None, email=None, username=None):
+    queries = User.query.filter(User.active.__eq__(True))
 
-def get_user(email):
-    return User.query.filter_by(email=email).one_or_none()
+    if id:
+        queries = queries.filter(User.id.__eq__(id))
+    
+    if email:
+        queries = queries.filter(User.email.__eq__(email))
 
+    if username:
+        queries = queries.filter(User.username.__eq__(username))
 
-def load_users():
-    return User.query.filter(User.active.__eq__(True)).all()
-
-
-def load_user(id):
-    return User.query.get(int(id))
+    return queries.one_or_none()
 
 
 def load_categories():
@@ -97,15 +99,3 @@ def stats_courses():
     return db.session.query(Category.id, Category.name, func.count(Course.id))\
         .join(Course, Course.category_id.__eq__(Category.id), isouter=True)\
         .group_by(Category.id).all()
-
-
-def exist_user(email=None, username=None):
-    query = User.query
-
-    if email:
-        query = query.filter_by(email=email)
-
-    if username:
-        query = query.filter_by(username=username)
-
-    return query.first()

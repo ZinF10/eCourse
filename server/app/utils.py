@@ -1,7 +1,6 @@
 from cloudinary.uploader import upload
 from cloudinary.utils import cloudinary_url
 
-
 def upload_image(image):
     if image:
         response = upload(image)
