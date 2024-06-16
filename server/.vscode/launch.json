@@ -19,7 +19,9 @@
                 "--reload"
             ],
             "jinja": true,
-            "autoStartBrowser": true
+            "autoStartBrowser": true,
+            "console": "internalConsole",
+            "justMyCode": true
         }
     ]
 }

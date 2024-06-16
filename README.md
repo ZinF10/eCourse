@@ -1,4 +1,4 @@
-# eCourse
+# eCourse 🎓
 
 Micro course system using `Flask`, `React`, `MySQL`.
 

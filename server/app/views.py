@@ -9,7 +9,7 @@ from flask_admin.form.upload import ImageUploadField
 from markupsafe import Markup
 from flask_babel import gettext
 from flask_admin.actions import action
-from app import db, dao, decorators
+from app import db, dao, decorators,  cache
 from .models import (
     Resource, Course, Lesson, Tag
 )
@@ -44,6 +44,13 @@ class BaseModelView(ModelView):
 
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin()
+
+    def __init__(self, model, session, *args, **kwargs):
+        super(BaseModelView, self).__init__(model, session, *args, **kwargs)
+    
+    @cache.cached(timeout=(60*60*2))
+    def render(self, *args, **kwargs):
+        return super(BaseModelView, self).render(*args, **kwargs)
 
 
 class ActionsView(BaseModelView):
@@ -107,10 +114,10 @@ class InstructorView(BaseModelView):
 
 
 class CategoryView(ActionsView):
-    column_list = ["name", "courses"] + ActionsView.column_list
+    column_list = ["name"] + ActionsView.column_list
     inline_models = [Course]
     column_searchable_list = ["name"]
-    column_editable_list = ["name", "courses"] + \
+    column_editable_list = ["name"] + \
         ActionsView.column_editable_list
     column_sortable_list = ["name"] + ActionsView.column_sortable_list
 

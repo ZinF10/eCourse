@@ -6,7 +6,7 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DB_USERNAME = os.environ.get('DB_USERNAME')
 DB_PASSWORD = os.environ.get('DB_PASSWORD')
 DB_HOST = os.environ.get('DB_HOST')
-
+DB_NAME = os.environ.get('DB_NAME')
 
 class Config(object):
     load_dotenv()
@@ -15,7 +15,7 @@ class Config(object):
     # SQLALCHEMY_DATABASE_URI = 'sqlite:///' + \
     #     os.path.join(BASE_DIR, 'database', 'ecourse.sqlite3')
     SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{DB_USERNAME}:{
-        DB_PASSWORD}@{DB_HOST}/ecourse?charset=utf8mb4'
+        DB_PASSWORD}@{DB_HOST}/{DB_NAME}?charset=utf8mb4'
 
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     FLASK_ADMIN_SWATCH = 'lux'
@@ -33,7 +33,8 @@ class LocalConfig(Config):
     DEBUG = True
     DEBUG_TB_INTERCEPT_REDIRECTS = False
     SQLALCHEMY_RECORD_QUERIES = True
-
+    CACHE_TYPE = 'simple'
+    CACHE_DEFAULT_TIMEOUT = 300
 
 class ProductionConfig(Config):
     DEBUG = False
