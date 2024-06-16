@@ -1,5 +1,5 @@
-import { Loading } from '@/components/common/Loading';
-import useFetch from '@/hooks/useFetch';
+import Loading from '@/components/common/Loading';
+import useFetch from '@/hooks/customs/useFetch';
 import endpoints from '@/services/endpoints';
 import { useParams } from 'react-router-dom';
 

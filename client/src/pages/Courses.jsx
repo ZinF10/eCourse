@@ -1,6 +1,6 @@
-import { Each } from '@/components/common/Each';
-import { Loading } from '@/components/common/Loading';
-import useFetch from '@/hooks/useFetch';
+import Each from '@/components/common/Each';
+import Loading from '@/components/common/Loading';
+import useFetch from '@/hooks/customs/useFetch';
 import endpoints from '@/services/endpoints';
 import { Link, useLocation } from 'react-router-dom';
 

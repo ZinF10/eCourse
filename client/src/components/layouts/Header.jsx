@@ -1,12 +1,22 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Each } from '../common/Each';
+import Each from '../common/Each';
 import endpoints from '@/services/endpoints';
-import useFetch from '@/hooks/useFetch';
-import { Loading } from '../common/Loading';
+import useFetch from '@/hooks/customs/useFetch';
+import Loading from '../common/Loading';
+import { useContext } from 'react';
+import AuthContext from '@/hooks/contexts/AuthContext';
+import useAuth from '@/hooks/customs/useAuth';
 
 const Header = () => {
 	const { data, isLoading, error } = useFetch(endpoints['categories']);
 	const navigate = useNavigate();
+	const [user] = useContext(AuthContext);
+	const { logout } = useAuth();
+
+	const handleLogout = () => {
+		logout();
+		navigate('/login');
+	};
 
 	if (isLoading) {
 		return <Loading />;
@@ -62,16 +72,52 @@ const Header = () => {
 								About
 							</Link>
 						</li>
-						<li>
-							<Link to={'/login'}>
-								Log In
-							</Link>
-						</li>
-						<li>
-							<Link to={'/register'}>
-								Register
-							</Link>
-						</li>
+						{user ? (
+							<>
+								<li>
+									<Link
+										to={`/profile/${encodeURI(
+											user.username,
+										)}`}>
+										Profile
+										(
+										{
+											user.username
+										}
+										)
+									</Link>
+								</li>
+								<li>
+									<Link
+										onClick={
+											handleLogout
+										}>
+										Log
+										Out
+									</Link>
+								</li>
+							</>
+						) : (
+							<>
+								<li>
+									<Link
+										to={
+											'/login'
+										}>
+										Log
+										In
+									</Link>
+								</li>
+								<li>
+									<Link
+										to={
+											'/register'
+										}>
+										Register
+									</Link>
+								</li>
+							</>
+						)}
 					</ul>
 
 					<form onSubmit={handleSubmit}>

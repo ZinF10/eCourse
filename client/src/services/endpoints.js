@@ -1,4 +1,10 @@
-import { CATEGORIES_API, COURSES_API, REGISTER_API } from '@/constants/constants';
+import {
+	CATEGORIES_API,
+	COURSES_API,
+	CURRENT_USER_API,
+	REGISTER_API,
+	TOKEN_API,
+} from '@/constants/constants';
 
 const endpoints = {
 	categories: CATEGORIES_API,
@@ -14,6 +20,8 @@ const endpoints = {
 	},
 	course_detail: (id) => `${COURSES_API}${id}`,
 	register: REGISTER_API,
+	token: TOKEN_API,
+	current_user: CURRENT_USER_API,
 };
 
 export default endpoints;
