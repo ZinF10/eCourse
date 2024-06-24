@@ -76,9 +76,7 @@ const Header = () => {
 							<>
 								<li>
 									<Link
-										to={`/profile/${encodeURI(
-											user.username,
-										)}`}>
+										to={'/profile'}>
 										Profile
 										(
 										{

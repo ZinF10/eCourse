@@ -3,6 +3,7 @@ import CourseDetail from '@/pages/CourseDetail';
 import Courses from '@/pages/Courses';
 import Home from '@/pages/Home';
 import LogIn from '@/pages/LogIn';
+import Profile from '@/pages/Profile';
 import Register from '@/pages/Register';
 
 const routes = [
@@ -37,6 +38,11 @@ const routes = [
 		path: '/courses/:id',
 		component: CourseDetail,
 		lazy: () => import('@/pages/CourseDetail'),
+	},
+	{
+		path: '/profile',
+		component: Profile,
+		lazy: () => import('@/pages/Profile'),
 	},
 ];
 

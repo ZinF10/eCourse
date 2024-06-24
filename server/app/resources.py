@@ -1,12 +1,13 @@
 from flask_restx import Resource
 from flask import abort, request
-from app import dao, schemas, api, utils
+from app import dao, schemas, api, utils, cache
 from flask_jwt_extended import jwt_required, current_user
-from .modules import category_ns, course_ns, lesson_ns, user_ns, user_parser
+from .modules import category_ns, course_ns, user_ns, user_parser, lesson_ns
 
 
 @category_ns.route('/')
 class Category(Resource):
+    @cache.cached(timeout=(60*60*2))
     def get(self):
         schema = schemas.CategorySchema(many=True)
         return schema.dump(dao.load_categories()), 200
@@ -14,6 +15,7 @@ class Category(Resource):
 
 @course_ns.route('/')
 class Course(Resource):
+    @cache.cached(timeout=(60*60*2))
     @course_ns.doc(params={
         'keyword': 'Search keyword',
         'max_price': 'Maximum price',
@@ -53,20 +55,26 @@ class Course(Resource):
         return schema.dump(courses['courses']), 200
 
 
-@course_ns.route('/<int:id>')
+@course_ns.route('/<int:id>/')
 class CourseDetail(Resource):
+    @cache.cached(timeout=(60*60*2))
     def get(self, id):
         course = dao.load_course(course_id=id)
         if not course:
             abort(404, description="Not found")
         return schemas.CourseDetailSchema().dump(course), 200
+    
 
-
-@lesson_ns.route('/')
-class Lesson(Resource):
-    def get(self):
-        schema = schemas.LessonSchema(many=True)
-        return schema.dump(dao.load_lessons()), 200
+@course_ns.route('/<int:id>/lessons/')
+class CourseLessons(Resource):
+    @cache.cached(timeout=(60*60*2))
+    def get(self, id):
+        course = dao.load_course(course_id=id)
+        if not course:
+            abort(404, description="Not found")
+        
+        lessons = dao.load_lessons(course=id)        
+        return schemas.LessonSchema(many=True).dump(lessons), 200
 
 
 @lesson_ns.route('/<int:id>')
@@ -76,7 +84,6 @@ class LessonDetail(Resource):
         if not lesson:
             abort(404, description="Not found")
         return schemas.LessonDetailSchema().dump(lesson), 200
-
 
 @user_ns.route('/')
 class User(Resource):
@@ -110,6 +117,7 @@ class User(Resource):
 
 @user_ns.route('/current-user/')
 class CurrentUser(Resource):
+    @cache.cached(timeout=(60*60*2))
     @jwt_required()
     def get(self):
         return schemas.CurrentUserSchema().dump(current_user), 200
@@ -118,4 +126,3 @@ class CurrentUser(Resource):
 api.add_namespace(user_ns)
 api.add_namespace(category_ns)
 api.add_namespace(course_ns)
-api.add_namespace(lesson_ns)

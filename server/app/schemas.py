@@ -33,11 +33,9 @@ class CourseDetailSchema(CourseSchema):
 
 
 class LessonSchema(ma.SQLAlchemyAutoSchema):
-    course = ma.Function(lambda obj: obj.course.subject)
-
     class Meta:
         model = Lesson
-        fields = ['id', 'title', 'image', 'course', 'date_created']
+        fields = ['id', 'subject', 'image', 'date_created']
 
 
 class LessonDetailSchema(LessonSchema):

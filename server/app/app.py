@@ -1,8 +1,7 @@
 from app import app, resources, admin, login_manager, dao, jwt
-from flask import flash, redirect, request, jsonify
+from flask import flash, redirect, request, jsonify, url_for
 from flask_login import login_user
 from flask_jwt_extended import create_access_token
-
 
 @login_manager.user_loader
 def load_user(user_id):

@@ -1,5 +1,6 @@
 import os
 import os.path as op
+from secrets import token_hex
 from flask import redirect, flash, url_for
 from flask_admin import expose, AdminIndexView, BaseView, form
 from flask_admin.contrib.sqla import ModelView
@@ -9,15 +10,14 @@ from flask_admin.form.upload import ImageUploadField
 from markupsafe import Markup
 from flask_babel import gettext
 from flask_admin.actions import action
-from app import db, dao, decorators,  cache
+from app import db, dao, decorators
 from .models import (
     Resource, Course, Lesson, Tag
 )
 from .widgets import CKTextAreaField
 
 
-images_path = op.join(op.dirname(__file__),
-                      f"static/uploads/images/")
+images_path = op.join(op.dirname(__file__), "static/uploads/images/")
 cdn_ckeditor = ['//cdn.ckeditor.com/4.6.0/full-all/ckeditor.js']
 
 try:
@@ -41,14 +41,14 @@ class BaseModelView(ModelView):
     can_view_details = True
     can_export = True
     page_size = 10
+    can_delete = True
 
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin()
-
+    
     def __init__(self, model, session, *args, **kwargs):
         super(BaseModelView, self).__init__(model, session, *args, **kwargs)
     
-    @cache.cached(timeout=(60*60*2))
     def render(self, *args, **kwargs):
         return super(BaseModelView, self).render(*args, **kwargs)
 
@@ -68,7 +68,6 @@ class ActionsView(BaseModelView):
             flash(gettext(f'Failed to change activate. {
                   str(e)}'), category='error')
 
-
 class ImageView(ModelView):
     def _list_thumbnail(view, context, model, name):
         if not model.image:
@@ -78,11 +77,17 @@ class ImageView(ModelView):
     column_formatters = {
         'image': _list_thumbnail
     }
+    
+    def prefix_name(obj, file_data):
+        _, ext = op.splitext(file_data.filename)
+        return token_hex(10) + ext
 
     form_extra_fields = {
         'image': ImageUploadField('Image',
                                   base_path=images_path,
-                                  thumbnail_size=(100, 100, True)
+                                  thumbnail_size=(200, 200, True),
+                                  url_relative_path="uploads/images/",
+                                  namegen=prefix_name
                                 )
     }
 
@@ -123,37 +128,37 @@ class CategoryView(ActionsView):
 
 
 class CourseView(ActionsView, ImageView):
-    column_list = ["subject", "image", "price", "category",
-                   "tags"] + ActionsView.column_list
+    column_list = ["subject", "image", "price", "category"
+            ] + ActionsView.column_list
     inline_models = [Lesson, Tag]
     column_searchable_list = ["subject"]
-    column_editable_list = ["subject", "price", "category", "tags"] + \
+    column_editable_list = ["subject", "price", "category"] + \
         ActionsView.column_editable_list
     column_sortable_list = ["subject", "price"] + \
         ActionsView.column_sortable_list
     column_filters = ["price"] + ActionsView.column_filters
     extra_js = cdn_ckeditor
+    
     form_overrides = {
         'description': CKTextAreaField
     }
 
 
 class TagView(ActionsView):
-    column_list = ["name", "courses"] + ActionsView.column_list
+    column_list = ["name", "course", "lesson"] + ActionsView.column_list
     column_searchable_list = ["name"]
-    column_editable_list = ["name", "courses"] + \
+    column_editable_list = ["name"] + \
         ActionsView.column_editable_list
     column_sortable_list = ["name"] + ActionsView.column_sortable_list
 
 
-class LessonView(ActionsView):
-    column_list = ["title", "course", "tags",
-                   "resources"] + ActionsView.column_list
+class LessonView(ActionsView, ImageView):
+    column_list = ["subject",  "image", "course"] + ActionsView.column_list
     inline_models = [Tag, Resource]
-    column_searchable_list = ["title"]
-    column_editable_list = ["title", "course",
-                            "tags", "resources"] + ActionsView.column_editable_list
-    column_sortable_list = ["title"] + ActionsView.column_sortable_list
+    column_searchable_list = ["subject"]
+    column_editable_list = ["subject", "course",
+                    ] + ActionsView.column_editable_list
+    column_sortable_list = ["subject"] + ActionsView.column_sortable_list
     extra_js = cdn_ckeditor
     form_overrides = {
         'content': CKTextAreaField

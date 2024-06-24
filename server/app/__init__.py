@@ -15,11 +15,12 @@ app.config.from_object(configs.LocalConfig)
 CORS(app=app, resources={r"/*": {"origins": "*"}})
 jwt = JWTManager(app=app)
 cache = Cache(app=app)
+toolbar = DebugToolbarExtension(app=app)
 api = Api(
     app=app,
     contact="zin.it.dev@gmail.com",
     contact_email="zin.it.dev@gmail.com",
-    version='1.0.0',
+    version='3.0.0',
     title='eCourse - Swagger UI',
     description='RESTful APIs for eCourse application 🌶️',
     doc="/",
@@ -30,8 +31,6 @@ ma = Marshmallow(app)
 db = SQLAlchemy(app=app)
 migrate = Migrate(app=app, db=db)
 login_manager = LoginManager(app=app)
-
-toolbar = DebugToolbarExtension(app=app)
 
 with app.app_context():
     from app import models

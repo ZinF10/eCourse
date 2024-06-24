@@ -85,7 +85,7 @@ class Course(BaseModel):
 
 
 class Lesson(BaseModel):
-    title = Column(String(100), unique=True)
+    subject = Column(String(100), unique=True)
     content = Column(Text)
     image = Column(String(255), default=None)
     course_id = Column(Integer, ForeignKey(Course.id), nullable=False)
@@ -93,7 +93,7 @@ class Lesson(BaseModel):
     resources = relationship('Resource', backref='lesson', lazy=True)
 
     def __str__(self):
-        return self.title
+        return self.subject
 
 
 class Resource(BaseModel):

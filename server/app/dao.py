@@ -76,8 +76,13 @@ def load_course(course_id):
     return Course.query.get(int(course_id))
 
 
-def load_lessons():
-    return Lesson.query.filter(Lesson.active.__eq__(True)).all()
+def load_lessons(course=None, lesson=None):
+    queries = Lesson.query.filter(Lesson.active.__eq__(True))
+
+    if course:
+        queries = queries.filter(Lesson.course_id.__eq__(course))
+        
+    return queries.all()
 
 
 def load_lesson(lesson_id):

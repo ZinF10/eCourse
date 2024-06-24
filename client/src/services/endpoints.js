@@ -18,7 +18,8 @@ const endpoints = {
 		}
 		return url;
 	},
-	course_detail: (id) => `${COURSES_API}${id}`,
+	course_detail: (id) => `${COURSES_API}${id}/`,
+	lessons_course: (id) => `${COURSES_API}${id}/lessons/`,
 	register: REGISTER_API,
 	token: TOKEN_API,
 	current_user: CURRENT_USER_API,
