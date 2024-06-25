@@ -1,7 +1,7 @@
 from app import app, resources, admin, login_manager, dao, jwt
-from flask import flash, redirect, request, jsonify, url_for
+from flask import flash, redirect, request, jsonify
 from flask_login import login_user
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, set_access_cookies, get_csrf_token
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -43,4 +43,6 @@ def get_token():
         return jsonify(message="Wrong email or password"), 401
 
     access_token = create_access_token(identity=user)
-    return jsonify(access_token=access_token)
+    res = jsonify(csrf_token=get_csrf_token(access_token), access_token=access_token)
+    set_access_cookies(res, access_token)
+    return res, 200

@@ -122,7 +122,7 @@ class CurrentUser(Resource):
     def get(self):
         return schemas.CurrentUserSchema().dump(current_user), 200
 
-
 api.add_namespace(user_ns)
 api.add_namespace(category_ns)
 api.add_namespace(course_ns)
+api.add_namespace(lesson_ns)

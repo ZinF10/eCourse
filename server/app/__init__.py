@@ -7,6 +7,7 @@ from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_caching import Cache
+from flask_mail import Mail
 from app import configs
 from .api import Api
 
@@ -16,6 +17,7 @@ CORS(app=app, resources={r"/*": {"origins": "*"}})
 jwt = JWTManager(app=app)
 cache = Cache(app=app)
 toolbar = DebugToolbarExtension(app=app)
+mail = Mail(app=app)
 api = Api(
     app=app,
     contact="zin.it.dev@gmail.com",

@@ -34,13 +34,13 @@ const CourseDetail = () => {
 						<li>Price: ${detail.price}</li>
 						<li>Category: {detail.category}</li>
 					</ul>
-					{lessons ? (<Each
+					{lessons && lessons.lenght > 0 ? (<Each
 						of={lessons}
 						render={(item, index) => (
 							<ul key={index}>
 								<li>
 									<Link
-										to={`courses/${item.id}`}>
+										to={`/courses/${detail.id}/lessons/${item.id}`}>
 										{item.subject}
 									</Link>
 								</li>
@@ -49,7 +49,7 @@ const CourseDetail = () => {
 					/>) : <p>No items</p>}
 				</>
 			) : (
-				<p>No items</p>
+				<p>The web course you have requested does not exist.</p>
 			)}
 		</section>
 	);

@@ -1,6 +1,7 @@
 import os
 import cloudinary
 from dotenv import load_dotenv
+from datetime import timedelta
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DB_USERNAME = os.environ.get('DB_USERNAME')
@@ -26,6 +27,9 @@ class Config(object):
         api_secret=os.environ.get('API_SECRET')
     )
     JWT_SECRET_KEY = os.environ.get('SECRET_KEY')
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
+    JWT_TOKEN_LOCATION = ["cookies"]
+    JWT_COOKIE_SECURE = False
     PAGE_SIZE = 10
 
 

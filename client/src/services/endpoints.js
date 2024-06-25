@@ -2,6 +2,7 @@ import {
 	CATEGORIES_API,
 	COURSES_API,
 	CURRENT_USER_API,
+	LESSONS_API,
 	REGISTER_API,
 	TOKEN_API,
 } from '@/constants/constants';
@@ -20,6 +21,7 @@ const endpoints = {
 	},
 	course_detail: (id) => `${COURSES_API}${id}/`,
 	lessons_course: (id) => `${COURSES_API}${id}/lessons/`,
+	lesson_detail: (id) => `${LESSONS_API}${id}`,
 	register: REGISTER_API,
 	token: TOKEN_API,
 	current_user: CURRENT_USER_API,

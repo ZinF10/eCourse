@@ -22,6 +22,21 @@
             "autoStartBrowser": true,
             "console": "internalConsole",
             "justMyCode": true
+        },
+        {
+            "name": "Docker: Python - Flask",
+            "type": "docker",
+            "request": "launch",
+            "preLaunchTask": "docker-run: debug",
+            "python": {
+                "pathMappings": [
+                    {
+                        "localRoot": "${workspaceFolder}",
+                        "remoteRoot": "/app"
+                    }
+                ],
+                "projectType": "flask"
+            }
         }
     ]
 }

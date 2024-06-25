@@ -1,13 +1,8 @@
-import os
-import os.path as op
-from secrets import token_hex
-from flask import redirect, flash, url_for
-from flask_admin import expose, AdminIndexView, BaseView, form
+from flask import redirect, flash
+from flask_admin import expose, AdminIndexView, BaseView
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.fileadmin import FileAdmin
 from flask_login import current_user, logout_user
-from flask_admin.form.upload import ImageUploadField
-from markupsafe import Markup
 from flask_babel import gettext
 from flask_admin.actions import action
 from app import db, dao, decorators
@@ -17,14 +12,7 @@ from .models import (
 from .widgets import CKTextAreaField
 
 
-images_path = op.join(op.dirname(__file__), "static/uploads/images/")
 cdn_ckeditor = ['//cdn.ckeditor.com/4.6.0/full-all/ckeditor.js']
-
-try:
-    os.mkdir(images_path)
-except OSError:
-    pass
-
 
 class AuthenticatedView(BaseView):
     def is_accessible(self):
@@ -68,41 +56,8 @@ class ActionsView(BaseModelView):
             flash(gettext(f'Failed to change activate. {
                   str(e)}'), category='error')
 
-class ImageView(ModelView):
-    def _list_thumbnail(view, context, model, name):
-        if not model.image:
-            return '-Empty-'
-        return Markup(f'<img src="{url_for('static', filename=f"uploads/images/{form.thumbgen_filename(model.image)}")}" alt="{model.subject}" width="80" height="80" class="img-thumbnail shadow" />')
-
-    column_formatters = {
-        'image': _list_thumbnail
-    }
-    
-    def prefix_name(obj, file_data):
-        _, ext = op.splitext(file_data.filename)
-        return token_hex(10) + ext
-
-    form_extra_fields = {
-        'image': ImageUploadField('Image',
-                                  base_path=images_path,
-                                  thumbnail_size=(200, 200, True),
-                                  url_relative_path="uploads/images/",
-                                  namegen=prefix_name
-                                )
-    }
-
-
 class UserView(ActionsView):
-    def _list_thumbnail(view, context, model, name):
-        if not model.avatar:
-            return '-Empty-'
-        return Markup(f'<img src="{model.avatar}" alt="{model.username}" width="80" height="80" class="img-thumbnail rounded-circle shadow" />')
-
-    column_formatters = {
-        'avatar': _list_thumbnail
-    }
-
-    column_list = ["username", "avatar", "role"] + ActionsView.column_list
+    column_list = ["username", "role"] + ActionsView.column_list
     column_searchable_list = ["username", "email"]
     column_editable_list = ["username", "role"] + \
         ActionsView.column_editable_list
@@ -127,8 +82,8 @@ class CategoryView(ActionsView):
     column_sortable_list = ["name"] + ActionsView.column_sortable_list
 
 
-class CourseView(ActionsView, ImageView):
-    column_list = ["subject", "image", "price", "category"
+class CourseView(ActionsView):
+    column_list = ["subject", "price", "category"
             ] + ActionsView.column_list
     inline_models = [Lesson, Tag]
     column_searchable_list = ["subject"]
@@ -152,8 +107,8 @@ class TagView(ActionsView):
     column_sortable_list = ["name"] + ActionsView.column_sortable_list
 
 
-class LessonView(ActionsView, ImageView):
-    column_list = ["subject",  "image", "course"] + ActionsView.column_list
+class LessonView(ActionsView):
+    column_list = ["subject", "course"] + ActionsView.column_list
     inline_models = [Tag, Resource]
     column_searchable_list = ["subject"]
     column_editable_list = ["subject", "course",
