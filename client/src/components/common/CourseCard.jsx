@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
 import PropTypes from 'prop-types';
-
+import { formatPrice } from "@/utils/format";
 
 const CourseCard = ({ item }) => {
     return (
@@ -10,8 +10,7 @@ const CourseCard = ({ item }) => {
                 {item.subject}
             </Link>
             <p>
-                Price: $
-                {item.price}
+                Price: {formatPrice(item.price)}
             </p>
             <p>
                 Category:{' '}

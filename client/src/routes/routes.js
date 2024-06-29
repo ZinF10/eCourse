@@ -4,11 +4,12 @@ import Courses from '@/pages/Courses';
 import Home from '@/pages/Home';
 import LessonDetail from '@/pages/LessonDetail';
 import LogIn from '@/pages/LogIn';
+import Orders from '@/pages/Orders';
 import PageNotFound from '@/pages/PageNotFound';
 import Profile from '@/pages/Profile';
 import Register from '@/pages/Register';
 
-const routes = [
+const PublicRoutes = [
 	{
 		path: '/',
 		exact: true,
@@ -47,15 +48,24 @@ const routes = [
 		lazy: () => import('@/pages/LessonDetail'),
 	},
 	{
-		path: '/profile',
-		component: Profile,
-		lazy: () => import('@/pages/Profile'),
-	},
-	{
 		path: '*',
 		component: PageNotFound,
 		lazy: () => import('@/pages/PageNotFound'),
 	},
 ];
 
-export default routes;
+
+const PrivateRoutes = [
+	{
+		path: '/profile',
+		component: Profile,
+		lazy: () => import('@/pages/Profile'),
+	},
+	{
+		path: '/orders',
+		component: Orders,
+		lazy: () => import('@/pages/Orders'),
+	},
+];
+
+export { PrivateRoutes, PublicRoutes };

@@ -25,6 +25,7 @@ const endpoints = {
 	register: REGISTER_API,
 	token: TOKEN_API,
 	current_user: CURRENT_USER_API,
+	orders: `${REGISTER_API}orders/`,
 };
 
 export default endpoints;

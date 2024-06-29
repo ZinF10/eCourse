@@ -6,7 +6,6 @@ from flask_login import UserMixin
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
-
 class Role(enum.Enum):
     ADMIN = 'Administrator'
     STUDENT = 'Student'
@@ -74,7 +73,7 @@ class Course(BaseModel):
     category_id = Column(Integer, ForeignKey(Category.id), nullable=False)
     instructor_id = Column(Integer, ForeignKey(Instructor.id), nullable=False)
     lessons = relationship('Lesson', backref='course', lazy=True)
-    tags = relationship('Tag', secondary='course_tag', backref='courses')
+    tags = relationship('Tag', secondary='course_tag', backref='courses', lazy=True)
     details = relationship('OrderDetail', backref='course', lazy=True)
     comments = relationship('Comment', backref='course', lazy=True)
     ratings = relationship('Rating', backref='course', lazy=True)

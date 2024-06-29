@@ -1,5 +1,5 @@
 from app import ma, db
-from .models import Category, Course, Tag, Lesson, User
+from .models import Category, Course, Tag, Lesson, User, Order, OrderDetail
 from marshmallow import post_load, fields
 
 
@@ -15,13 +15,18 @@ class TagSchema(ma.SQLAlchemyAutoSchema):
         fields = ['name']
 
 
-class CourseSchema(ma.SQLAlchemyAutoSchema):
-    category = fields.Function(lambda obj: obj.category.name)
+class CourseBaseSchema(ma.SQLAlchemyAutoSchema):
+    category = fields.Function(lambda obj: obj.category.name if obj.category else None)
 
     class Meta:
         model = Course
-        fields = ['id', 'subject', 'image',
-                  'price', 'category', 'date_created']
+        fields = ['id', 'subject', 'image', 'category']
+
+
+class CourseSchema(CourseBaseSchema):
+    class Meta:
+        model = CourseBaseSchema.Meta.model
+        fields = CourseBaseSchema.Meta.fields + ['price', 'date_created']
 
 
 class CourseDetailSchema(CourseSchema):
@@ -31,6 +36,28 @@ class CourseDetailSchema(CourseSchema):
         model = CourseSchema.Meta.model
         fields = CourseSchema.Meta.fields + ['description', 'tags']
 
+
+class OrderDetailSchema(ma.SQLAlchemyAutoSchema):
+    course = ma.Nested(CourseBaseSchema)    
+    class Meta:
+        model = OrderDetail
+        fields = ['order_id', 'course', 'unit_price', 'quantity']
+
+
+class OrderSchema(ma.SQLAlchemyAutoSchema):
+    total_price = fields.Method('sum_price')
+    details = ma.List(ma.Nested(OrderDetailSchema))
+    
+    class Meta:
+        model = Order
+        fields = ['id', 'total_price', 'active', 'details', 'date_created']
+    
+    def sum_price(self, obj):
+        total_price = 0.0
+        for detail in obj.details:
+            total_price += detail.unit_price * detail.quantity
+        return total_price
+    
 
 class LessonSchema(ma.SQLAlchemyAutoSchema):
     class Meta:

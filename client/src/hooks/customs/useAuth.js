@@ -29,7 +29,7 @@ const useAuth = () => {
 				{ path: '/' },
 			);
 
-			const userResponse = await axiosInstance.get(
+			const user = await axiosInstance.get(
 				endpoints['current_user'],
 				{
 					headers: {
@@ -40,13 +40,13 @@ const useAuth = () => {
 				},
 			);
 
-			cookie.save('current_user', userResponse.data, {
+			cookie.save('current_user', user.data, {
 				path: '/',
 			});
 
 			dispatch({
 				type: 'LOGIN',
-				payload: userResponse.data,
+				payload: user.data,
 			});
 
 			return true;

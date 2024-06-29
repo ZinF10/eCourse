@@ -1,6 +1,6 @@
-from app import db
+from app import db, cache
 from .configs import Config
-from .models import User, Category, Course, Lesson
+from .models import User, Category, Course, Lesson, Order, OrderDetail
 from sqlalchemy import func, extract
 
 def load_user(id=None, email=None, username=None):
@@ -18,6 +18,7 @@ def load_user(id=None, email=None, username=None):
     return queries.one_or_none()
 
 
+@cache.cached(timeout=(60*60*2))
 def load_categories():
     return Category.query.filter(Category.active.__eq__(True)).all()
 
@@ -89,6 +90,21 @@ def load_lesson(lesson_id):
     return Lesson.query.get(int(lesson_id))
 
 
+
+def load_order(order_id):
+    return Order.query.get(int(order_id))
+
+
+def load_orders(user=None):
+    queries = Order.query
+    
+    if user:
+        queries = queries.filter(Order.user_id.__eq__(user))
+    
+    return queries.all()
+
+
+@cache.cached(timeout=(60*60*2))
 def auth_user(email, password):
     user = User.query.filter(User.email.__eq__(email)).first()
     return user if user and user.check_password(password=password) and user.is_admin() else None

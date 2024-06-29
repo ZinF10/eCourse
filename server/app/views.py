@@ -7,7 +7,7 @@ from flask_babel import gettext
 from flask_admin.actions import action
 from app import db, dao, decorators
 from .models import (
-    Resource, Course, Lesson, Tag
+    Resource, Course, Lesson, Tag, Order, OrderDetail
 )
 from .widgets import CKTextAreaField
 
@@ -57,6 +57,7 @@ class ActionsView(BaseModelView):
                   str(e)}'), category='error')
 
 class UserView(ActionsView):
+    inline_models = [Order]
     column_list = ["username", "role"] + ActionsView.column_list
     column_searchable_list = ["username", "email"]
     column_editable_list = ["username", "role"] + \
@@ -130,18 +131,11 @@ class ResourceView(ActionsView):
 
 
 class OrderView(ActionsView):
+    inline_models = [OrderDetail]
     column_list = ["user", "details"] + ActionsView.column_list
     column_editable_list = ["user"] + \
         ActionsView.column_editable_list
     column_sortable_list = ["user"] + \
-        ActionsView.column_sortable_list
-
-
-class OrderDetailView(ActionsView):
-    column_list = ["order", "course"] + ActionsView.column_list
-    column_editable_list = ["order", "course"] + \
-        ActionsView.column_editable_list
-    column_sortable_list = ["order", "course"] + \
         ActionsView.column_sortable_list
 
 

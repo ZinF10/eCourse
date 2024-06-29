@@ -8,11 +8,11 @@ from .views import (
     CategoryView, TagView, AdminView, AnalyticsView, 
     UploadFileView, UserView, InstructorView, CourseView,
     CommentView, LessonView, LikeView, LogoutView,
-    OrderDetailView, OrderView, RatingView, ResourceView
+    OrderView, RatingView, ResourceView
 )
 from .models import (
     Category, Course, Tag, Lesson, User, Instructor,
-    Resource, Order, Like, Rating, Comment, OrderDetail
+    Resource, Order, Like, Rating, Comment
 )
 
 path = op.join(op.dirname(__file__), "static")
@@ -47,7 +47,6 @@ admin.add_view(LessonView(Lesson, db.session, category="Management"))
 admin.add_view(ResourceView(Resource, db.session, category="Management"))
 admin.add_view(TagView(Tag, db.session, category="Management"))
 admin.add_view(OrderView(Order, db.session, category="Management"))
-admin.add_view(OrderDetailView(OrderDetail, db.session, category="Management", endpoint="order-detail"))
 admin.add_view(CommentView(Comment, db.session, category="Management"))
 admin.add_view(RatingView(Rating, db.session, category="Management"))
 admin.add_view(LikeView(Like, db.session, category="Management"))

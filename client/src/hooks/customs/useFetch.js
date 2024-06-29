@@ -1,5 +1,6 @@
 import axiosInstance from '@/services/APIs';
 import { useCallback, useEffect, useState } from 'react';
+import cookie from 'react-cookies';
 
 const useFetch = (url) => {
 	const [data, setData] = useState(null);
@@ -9,7 +10,13 @@ const useFetch = (url) => {
 	const fetchData = useCallback(async () => {
 		try {
 			setLoading(true);
-			const response = await axiosInstance.get(url);
+			const response = await axiosInstance.get(url, {
+				headers: {
+					Authorization: `Bearer ${cookie.load(
+						'access_token',
+					)}`,
+				},
+			});
 			setData(response.data);
 			setError(null);
 		} catch (error) {

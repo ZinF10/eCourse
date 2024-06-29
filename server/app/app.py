@@ -1,5 +1,5 @@
 from app import app, resources, admin, login_manager, dao, jwt
-from flask import flash, redirect, request, jsonify
+from flask import flash, redirect, request, url_for, jsonify
 from flask_login import login_user
 from flask_jwt_extended import create_access_token, set_access_cookies, get_csrf_token
 
@@ -17,11 +17,10 @@ def admin_login():
     if user:
         flash(f"Welcome to {user.username} comeback!", category="success")
         login_user(user=user)
-        return redirect('/admin')
+        return redirect(url_for('admin.index'))
 
     flash("Invalid email or password. Please try again.", category="warning")
-    return redirect('/admin')
-
+    return redirect(url_for('admin.index'))
 
 @jwt.user_identity_loader
 def user_identity_lookup(user):
@@ -43,6 +42,4 @@ def get_token():
         return jsonify(message="Wrong email or password"), 401
 
     access_token = create_access_token(identity=user)
-    res = jsonify(csrf_token=get_csrf_token(access_token), access_token=access_token)
-    set_access_cookies(res, access_token)
-    return res, 200
+    return jsonify(access_token=access_token), 200

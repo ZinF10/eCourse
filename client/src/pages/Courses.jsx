@@ -24,7 +24,6 @@ const Courses = () => {
 	return (
 		<section>
 			<h1>Courses</h1>
-
 			{data && data.length > 0 ? (
 				<Each
 					of={data}

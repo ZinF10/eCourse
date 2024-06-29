@@ -21,6 +21,10 @@ user_ns = Namespace(
     name='users',
     description='Operations related to users'
 )
+order_ns = Namespace(
+    name='orders',
+    description='Operations related to orders of current user'
+)
 
 user_model = user_ns.model('User', {
     'username': fields.String(required=True, description='The username'),

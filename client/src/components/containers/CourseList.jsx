@@ -1,25 +1,13 @@
-import useFetch from "@/hooks/customs/useFetch";
-import endpoints from "@/services/endpoints";
-import Loading from "../common/Loading";
 import Each from "../common/Each";
 import CourseCard from "../common/CourseCard";
+import PropTypes from 'prop-types';
 
-const CourseList = () => {
-    const { data, isLoading, error } = useFetch(endpoints['courses']());
-
-    if (isLoading) {
-        return <Loading />;
-    }
-
-    if (error) {
-        return <p>{error}</p>;
-    }
-
+const CourseList = ({ courses }) => {
     return (
         <>
-            {data ? (
+            {courses ? (
                 <Each
-                    of={data}
+                    of={courses}
                     render={(item, index) => (
                         <section key={index}>
                             <CourseCard item={item} />
@@ -32,5 +20,17 @@ const CourseList = () => {
         </>
     )
 }
+
+CourseList.propTypes = {
+    courses: PropTypes.arrayOf(
+        PropTypes.shape({
+            id: PropTypes.number.isRequired,
+            subject: PropTypes.string.isRequired,
+            image: PropTypes.string,
+            price: PropTypes.number.isRequired,
+            date_created: PropTypes.string.isRequired
+        })
+    ).isRequired,
+};
 
 export default CourseList

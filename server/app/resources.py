@@ -1,21 +1,20 @@
 from flask_restx import Resource
 from flask import abort, request
-from app import dao, schemas, api, utils, cache
+from app import dao, schemas, api, utils
+from .modules import category_ns, course_ns, user_ns, user_parser, lesson_ns, order_ns
 from flask_jwt_extended import jwt_required, current_user
-from .modules import category_ns, course_ns, user_ns, user_parser, lesson_ns
 
 
 @category_ns.route('/')
 class Category(Resource):
-    @cache.cached(timeout=(60*60*2))
     def get(self):
+        categories = dao.load_categories()
         schema = schemas.CategorySchema(many=True)
-        return schema.dump(dao.load_categories()), 200
+        return schema.dump(categories), 200
 
 
 @course_ns.route('/')
 class Course(Resource):
-    @cache.cached(timeout=(60*60*2))
     @course_ns.doc(params={
         'keyword': 'Search keyword',
         'max_price': 'Maximum price',
@@ -57,7 +56,6 @@ class Course(Resource):
 
 @course_ns.route('/<int:id>/')
 class CourseDetail(Resource):
-    @cache.cached(timeout=(60*60*2))
     def get(self, id):
         course = dao.load_course(course_id=id)
         if not course:
@@ -67,7 +65,6 @@ class CourseDetail(Resource):
 
 @course_ns.route('/<int:id>/lessons/')
 class CourseLessons(Resource):
-    @cache.cached(timeout=(60*60*2))
     def get(self, id):
         course = dao.load_course(course_id=id)
         if not course:
@@ -117,12 +114,31 @@ class User(Resource):
 
 @user_ns.route('/current-user/')
 class CurrentUser(Resource):
-    @cache.cached(timeout=(60*60*2))
     @jwt_required()
     def get(self):
-        return schemas.CurrentUserSchema().dump(current_user), 200
+        user = dao.load_user(id=current_user.id)
+        return schemas.CurrentUserSchema().dump(user), 200
+
+
+@user_ns.route('/orders/')
+class OrderCurrentUser(Resource):
+    @jwt_required()
+    def get(self):
+        orders = dao.load_orders(user=current_user.id)       
+        return schemas.OrderSchema(many=True).dump(orders), 200
+
+
+@order_ns.route('/<int:id>')
+class OrderDetail(Resource):
+    def get(self, id):
+        order = dao.load_order(order_id=id)
+        if not order:
+            abort(404, description="Not found")
+        return schemas.OrderSchema(many=True).dump(order), 200
+
 
 api.add_namespace(user_ns)
 api.add_namespace(category_ns)
 api.add_namespace(course_ns)
 api.add_namespace(lesson_ns)
+api.add_namespace(order_ns)

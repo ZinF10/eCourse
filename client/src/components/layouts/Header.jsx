@@ -72,6 +72,11 @@ const Header = () => {
 								About
 							</Link>
 						</li>
+						<li>
+							<Link to={'/orders'}>
+								Orders
+							</Link>
+						</li>
 						{user ? (
 							<>
 								<li>

@@ -30,11 +30,7 @@ const LogIn = () => {
 	const onSubmit = async (data) => {
 		const success = await login(data.email, data.password);
 
-		if (success) {
-			isAuthenticated() ?? navigate('/');
-		} else {
-			alert('Login failed');
-		}
+		success && (isAuthenticated() ?? navigate('/'))
 	};
 
 	return (

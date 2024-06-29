@@ -28,7 +28,7 @@ class Config(object):
     )
     JWT_SECRET_KEY = os.environ.get('SECRET_KEY')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
-    JWT_TOKEN_LOCATION = ["cookies"]
+    JWT_TOKEN_LOCATION = ['headers']
     JWT_COOKIE_SECURE = False
     PAGE_SIZE = 10
 
