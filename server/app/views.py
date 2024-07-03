@@ -1,16 +1,47 @@
-from flask import redirect, flash
+import os, os.path as op
+from flask import redirect, flash, url_for
 from flask_admin import expose, AdminIndexView, BaseView
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.fileadmin import FileAdmin
 from flask_login import current_user, logout_user
 from flask_babel import gettext
+from flask_admin.form.upload import ImageUploadField
 from flask_admin.actions import action
 from app import db, dao, decorators
 from .models import (
     Resource, Course, Lesson, Tag, Order, OrderDetail
 )
 from .widgets import CKTextAreaField
+from secrets import token_hex
+from flask_admin import form
+from sqlalchemy.event import listens_for
+from markupsafe import Markup
 
+file_path = op.join(op.dirname(__file__), f'static/images')
+
+try:
+    os.mkdir(file_path)
+except OSError:
+    pass
+
+
+def prefix_name(obj, file_data):
+    _, ext = op.splitext(file_data.filename)
+    return token_hex(10) + ext
+
+
+@listens_for(Course, 'after_delete')
+def del_image(mapper, connection, target):
+    if target.image:
+        try:
+            os.remove(op.join(file_path, target.image))
+        except OSError:
+            pass
+
+        try:
+            os.remove(op.join(file_path, form.thumbgen_filename(target.image)))
+        except OSError:
+            pass
 
 cdn_ckeditor = ['//cdn.ckeditor.com/4.6.0/full-all/ckeditor.js']
 
@@ -82,9 +113,27 @@ class CategoryView(ActionsView):
         ActionsView.column_editable_list
     column_sortable_list = ["name"] + ActionsView.column_sortable_list
 
+class ImageView(ModelView):
+    def _list_thumbnail(view, context, model, name):
+        if not model.image:
+            return '-Empty-'
+            
+        return Markup(f'<img src="{url_for('static', filename=f"images/{form.thumbgen_filename(model.image)}")}" alt="{model.subject}" width="80" height="80" class="img-thumbnail rounded-circle shadow" />')
 
-class CourseView(ActionsView):
-    column_list = ["subject", "price", "category"
+    column_formatters = {'image': _list_thumbnail}
+
+    form_extra_fields = {
+        'image': ImageUploadField(
+            "Image",
+            base_path=file_path,
+            url_relative_path="images/",
+            thumbnail_size=(200, 200, True),
+            namegen=prefix_name
+        )
+    }
+
+class CourseView(ActionsView, ImageView):
+    column_list = ["subject", "image", "price", "category"
             ] + ActionsView.column_list
     inline_models = [Lesson, Tag]
     column_searchable_list = ["subject"]

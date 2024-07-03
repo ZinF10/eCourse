@@ -3,6 +3,7 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import useAuth from '@/hooks/customs/useAuth';
 import { useNavigate } from 'react-router-dom';
+import useDocumentTitle from '@/hooks/customs/useDocumentTitle';
 
 const schema = yup
 	.object()
@@ -16,6 +17,8 @@ const schema = yup
 	.required();
 
 const LogIn = () => {
+	useDocumentTitle('Log In - eCourse 🎓')
+
 	const {
 		register,
 		handleSubmit,

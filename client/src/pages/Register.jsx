@@ -3,6 +3,7 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axiosInstance from '@/services/APIs';
 import endpoints from '@/services/endpoints';
+import useDocumentTitle from '@/hooks/customs/useDocumentTitle';
 
 const schema = yup
 	.object()
@@ -29,6 +30,8 @@ const schema = yup
 	.required();
 
 const Register = () => {
+	useDocumentTitle('Register - eCourse 🎓')
+
 	const {
 		register,
 		handleSubmit,

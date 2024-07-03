@@ -6,14 +6,14 @@ const CourseList = ({ courses }) => {
     return (
         <>
             {courses ? (
-                <Each
-                    of={courses}
-                    render={(item, index) => (
-                        <section key={index}>
-                            <CourseCard item={item} />
-                        </section>
-                    )}
-                />
+                <section className="flex">
+                    <Each
+                        of={courses}
+                        render={(item, index) => (
+                            <CourseCard item={item} key={index} />
+                        )}
+                    />
+                </section>
             ) : (
                 <p>No items exists</p>
             )}

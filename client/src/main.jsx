@@ -3,10 +3,12 @@ import ReactDOM from 'react-dom/client';
 import App from '@/App';
 import '@/assets/styles/global.css';
 import { Provider } from 'react-redux';
-import { store } from './redux/store';
-import Loading from './components/common/Loading';
+import { store } from '@/redux/store';
+import Loading from '@/components/common/Loading';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+const root = document.getElementById('root')
+
+ReactDOM.createRoot(root).render(
 	<React.StrictMode>
 		<React.Suspense fallback={<Loading />}>
 			<Provider store={store}>

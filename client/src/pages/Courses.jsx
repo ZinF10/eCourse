@@ -1,10 +1,12 @@
 import Each from '@/components/common/Each';
 import Loading from '@/components/common/Loading';
+import useDocumentTitle from '@/hooks/customs/useDocumentTitle';
 import useFetch from '@/hooks/customs/useFetch';
 import endpoints from '@/services/endpoints';
 import { Link, useLocation } from 'react-router-dom';
 
 const Courses = () => {
+	useDocumentTitle('Courses - eCourse 🎓')
 	const location = useLocation();
 	const queryParams = new URLSearchParams(location.search);
 	const category = queryParams.get('category');

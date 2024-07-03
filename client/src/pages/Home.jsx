@@ -19,15 +19,15 @@ const Home = () => {
 	}
 
 	return (
-		<section>
-			<h1>Home</h1>
+		<>
+			<section className='py-4'>
+				{user && (
+					<Greeting username={user.username} />
+				)}
 
-			{user && (
-				<Greeting username={user.username} />
-			)}
-
-			<CourseList courses={data}/>
-		</section>
+				<CourseList courses={data} />
+			</section>
+		</>
 	);
 };
 

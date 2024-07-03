@@ -1,6 +1,7 @@
 from app import ma, db
 from .models import Category, Course, Tag, Lesson, User, Order, OrderDetail
 from marshmallow import post_load, fields
+from flask import url_for
 
 
 class CategorySchema(ma.SQLAlchemyAutoSchema):
@@ -17,11 +18,16 @@ class TagSchema(ma.SQLAlchemyAutoSchema):
 
 class CourseBaseSchema(ma.SQLAlchemyAutoSchema):
     category = fields.Function(lambda obj: obj.category.name if obj.category else None)
-
+    image = fields.Method("get_image_url")
+    
     class Meta:
         model = Course
         fields = ['id', 'subject', 'image', 'category']
 
+    def get_image_url(self, obj):
+        if obj.image:
+            return url_for('static', filename='images/' + obj.image, _external=True)
+        return None
 
 class CourseSchema(CourseBaseSchema):
     class Meta:
