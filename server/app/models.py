@@ -1,10 +1,11 @@
 import enum
-from app import db
+from .extensions import db
 from sqlalchemy import Column, Integer, Boolean, DateTime, String, ForeignKey, Text, Float, Enum
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+
 
 class Role(enum.Enum):
     ADMIN = 'Administrator'
@@ -17,7 +18,7 @@ class BaseModel(db.Model):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     active = Column(Boolean, default=True)
-    date_created = Column(DateTime, default=datetime.utcnow())
+    date_created = Column(DateTime, default=datetime.utcnow)
 
 
 class User(UserMixin, BaseModel):
@@ -71,7 +72,7 @@ class Course(BaseModel):
     image = Column(String(255), default=None)
     price = Column(Float, default=0.00)
     category_id = Column(Integer, ForeignKey(Category.id), nullable=False)
-    instructor_id = Column(Integer, ForeignKey(Instructor.id), nullable=False)
+    instructor_id = Column(Integer, ForeignKey(Instructor.id), nullable=True)
     lessons = relationship('Lesson', backref='course', lazy=True)
     tags = relationship('Tag', secondary='course_tag', backref='courses', lazy=True)
     details = relationship('OrderDetail', backref='course', lazy=True)
@@ -136,13 +137,12 @@ class Order(BaseModel):
 
 
 class OrderDetail(BaseModel):
-    quantity = Column(Integer, default=1)
     unit_price = Column(Float, default=0.0)
     course_id = Column(Integer, ForeignKey(Course.id), nullable=False)
     order_id = Column(Integer, ForeignKey(Order.id), nullable=False)
 
     def __str__(self):
-        return f'<Details "{self.quantity} * {self.unit_price}">'
+        return f'<Details: #{self.course_id}{self.unit_price}">'
 
 
 class InteractionModel(BaseModel):

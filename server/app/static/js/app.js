@@ -1,50 +1,40 @@
 function generateRandomColor(alphat = 0.2) {
-	let red = Math.floor(parseInt(Math.random() * 255));
-	let green = Math.floor(parseInt(Math.random() * 255));
-	let blue = Math.floor(parseInt(Math.random() * 255));
+	const red = Math.floor(parseInt(Math.random() * 255));
+	const green = Math.floor(parseInt(Math.random() * 255));
+	const blue = Math.floor(parseInt(Math.random() * 255));
 
 	return `rgb(${red},${green},${blue}, ${alphat})`;
 }
 
-function loadChart(
-	newCtx,
-	type,
-	lables,
-	title,
-	label,
-	data,
-	backgroundColor,
-	borderColor,
-) {
-	new Chart(newCtx, {
+function loadChart(ctx, type, labels, title, yAxisLabel, data, backgroundColor, borderColor) {
+	if (window.myChart) {
+		window.myChart.destroy();
+	}
+	window.myChart = new Chart(ctx, {
 		type: type,
 		data: {
-			labels: lables,
-			datasets: [
-				{
-					label: label,
-					data: data,
-					backgroundColor: backgroundColor,
-					borderColor: borderColor,
-					borderWidth: 1,
-				},
-			],
+			labels: labels,
+			datasets: [{
+				label: yAxisLabel,
+				data: data,
+				backgroundColor: backgroundColor,
+				borderColor: borderColor,
+				borderWidth: 1
+			}]
 		},
 		options: {
+			responsive: true,
 			scales: {
 				y: {
-					beginAtZero: true,
-				},
+					beginAtZero: true
+				}
 			},
 			plugins: {
 				title: {
 					display: true,
-					text: title,
-					padding: {
-						top: 10,
-					}
-				},
-			},
-		},
+					text: title
+				}
+			}
+		}
 	});
 }

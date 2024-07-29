@@ -6,7 +6,7 @@ const CourseList = ({ courses }) => {
     return (
         <>
             {courses ? (
-                <section className="flex">
+                <section className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
                     <Each
                         of={courses}
                         render={(item, index) => (

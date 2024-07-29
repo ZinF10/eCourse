@@ -1,144 +1,51 @@
-from flask_restx import Resource
+from flask_restx import Resource, Namespace
 from flask import abort, request
-from app import dao, schemas, api, utils
-from .modules import category_ns, course_ns, user_ns, user_parser, lesson_ns, order_ns
-from flask_jwt_extended import jwt_required, current_user
+from .dao import load_categories, load_courses, load_course
+from .serializers import category_model, course_model, user_model, course_parser, course_details_model
+
+category_ns = Namespace('categories', description='Category operations', ordered=True)
+course_ns = Namespace('courses', description='Course operations', ordered=True)
+user_ns = Namespace('users', description='User operations', ordered=True)
+
+
+@user_ns.route('/')
+class UserResource(Resource):
+    @user_ns.marshal_with(user_model, code=201)
+    def post(self):
+        pass
 
 
 @category_ns.route('/')
-class Category(Resource):
+@category_ns.doc(responses={404: 'Not Found'})
+class CategoryResource(Resource):
+    @category_ns.marshal_with(category_model, code=200, as_list=True)
     def get(self):
-        categories = dao.load_categories()
-        schema = schemas.CategorySchema(many=True)
-        return schema.dump(categories), 200
-
-
+        """ Get all categories """
+        return load_categories()
+    
+    
 @course_ns.route('/')
-class Course(Resource):
+class CourseResource(Resource):
     @course_ns.doc(params={
-        'keyword': 'Search keyword',
-        'max_price': 'Maximum price',
-        'min_price': 'Minimum price',
-        'release_month': 'Filter by release month (1-12)',
-        'release_month_after': 'Filter courses released after this month (1-12)',
-        'release_month_before': 'Filter courses released before this month (1-12)',
-        'latest': 'Filter by latest products (true/false)',
+        'category': 'An Category ID',
+        'keyword': 'Keyword to search for',
+        'from_price': 'Minimum price',
+        'to_price': 'Maximum price',
         'page': 'Page number',
-        'category': 'Filter category id',
     })
+    @course_ns.expect(course_parser)
+    @course_ns.marshal_with(course_model, code=200, envelope="results", as_list=True)
     def get(self):
-        category = request.args.get('category', type=int)
-        keyword = request.args.get('keyword', type=str)
-        from_price = request.args.get('min_price', type=float)
-        to_price = request.args.get('max_price', type=float)
-        release_month = request.args.get('release_month', type=int)
-        release_month_after = request.args.get('release_month_after', type=int)
-        release_month_before = request.args.get(
-            'release_month_before', type=int)
-        is_latest = request.args.get('latest', type=bool, default=False)
-        page = request.args.get('page', type=int, default=1)
-
-        courses = dao.load_courses(
-            category=category,
-            keyword=keyword,
-            from_price=from_price,
-            to_price=to_price,
-            release_month=release_month,
-            release_month_after=release_month_after,
-            release_month_before=release_month_before,
-            is_latest=is_latest,
-            page=page
-        )
-
-        schema = schemas.CourseSchema(many=True)
-        return schema.dump(courses['courses']), 200
-
-
-@course_ns.route('/<int:id>/')
-class CourseDetail(Resource):
-    def get(self, id):
-        course = dao.load_course(course_id=id)
-        if not course:
-            abort(404, description="Not found")
-        return schemas.CourseDetailSchema().dump(course), 200
+        """ Get all courses """
+        args = course_parser.parse_args()
+        return load_courses(**args)
     
 
-@course_ns.route('/<int:id>/lessons/')
-class CourseLessons(Resource):
+@course_ns.route('/<int:id>/')
+@course_ns.param('id', 'An ID')
+@course_ns.response(404, 'Not found')
+class CourseDetailsResource(Resource):
+    @course_ns.marshal_with(course_details_model, code=200)
     def get(self, id):
-        course = dao.load_course(course_id=id)
-        if not course:
-            abort(404, description="Not found")
-        
-        lessons = dao.load_lessons(course=id)        
-        return schemas.LessonSchema(many=True).dump(lessons), 200
-
-
-@lesson_ns.route('/<int:id>')
-class LessonDetail(Resource):
-    def get(self, id):
-        lesson = dao.load_lesson(lesson_id=id)
-        if not lesson:
-            abort(404, description="Not found")
-        return schemas.LessonDetailSchema().dump(lesson), 200
-
-@user_ns.route('/')
-class User(Resource):
-    @user_ns.expect(user_parser)
-    def post(self):
-        data = user_parser.parse_args()
-        username = data.get('username')
-        email = data.get('email')
-        password = data.get('password')
-        first_name = data.get('first_name')
-        last_name = data.get('last_name')
-        avatar = request.files.get('avatar')
-
-        if not all([username, email, password, first_name, last_name]):
-            return {'message': 'Missing required fields'}, 400
-
-        if dao.load_user(email=email):
-            return {'message': 'Email already exists'}, 400
-
-        if dao.load_user(username=username):
-            return {'message': 'Username already exists'}, 400
-
-        avatar_url = utils.upload_image(avatar)
-        data['avatar'] = avatar_url
-
-        user_schema = schemas.UserSchema()
-        user = user_schema.load(data)
-
-        return user_schema.dump(user), 201
-            
-
-@user_ns.route('/current-user/')
-class CurrentUser(Resource):
-    @jwt_required()
-    def get(self):
-        user = dao.load_user(id=current_user.id)
-        return schemas.CurrentUserSchema().dump(user), 200
-
-
-@user_ns.route('/orders/')
-class OrderCurrentUser(Resource):
-    @jwt_required()
-    def get(self):
-        orders = dao.load_orders(user=current_user.id)       
-        return schemas.OrderSchema(many=True).dump(orders), 200
-
-
-@order_ns.route('/<int:id>')
-class OrderDetail(Resource):
-    def get(self, id):
-        order = dao.load_order(order_id=id)
-        if not order:
-            abort(404, description="Not found")
-        return schemas.OrderSchema(many=True).dump(order), 200
-
-
-api.add_namespace(user_ns)
-api.add_namespace(category_ns)
-api.add_namespace(course_ns)
-api.add_namespace(lesson_ns)
-api.add_namespace(order_ns)
+        """ Get details course """
+        return load_course(course_id=id) or abort(404, 'Not found')

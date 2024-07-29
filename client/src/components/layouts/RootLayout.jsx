@@ -6,7 +6,7 @@ const RootLayout = () => {
 	return (
 		<>
 			<Header />
-			<main className='mx-auto max-w-screen-xl p-2 lg:p-4 max-h-screen'>
+			<main className='mx-auto max-w-screen-xl lg:py-4'>
 				<Outlet />
 			</main>
 			<Footer />

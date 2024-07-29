@@ -6,9 +6,9 @@ import { Provider } from 'react-redux';
 import { store } from '@/redux/store';
 import Loading from '@/components/common/Loading';
 
-const root = document.getElementById('root')
+const root = ReactDOM.createRoot(document.getElementById('root'))
 
-ReactDOM.createRoot(root).render(
+root.render(
 	<React.StrictMode>
 		<React.Suspense fallback={<Loading />}>
 			<Provider store={store}>

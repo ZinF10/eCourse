@@ -1,5 +1,5 @@
 import Loading from "@/components/common/Loading";
-import useFetch from "@/hooks/customs/useFetch";
+import useFetch from "@/hooks/customs/useAxios";
 import endpoints from "@/services/endpoints";
 import { useParams } from "react-router-dom";
 import PageNotFound from "./PageNotFound";

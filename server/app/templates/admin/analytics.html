@@ -2,53 +2,119 @@
 <h2 class="my-4 text-center">Analytics & Statistics</h2>
 
 <div class="row">
-	<div class="col-md-12">
-		<div class="card">
-			<div class="card-body">
-				<form
-					method="GET"
-					action="/admin/analytics/"
-					class="form">
-					<div class="form-group">
-						<div class="row">
-							<div class="col">
-								<input
-									type="date"
-									class="form-control"
-									id="from_date"
-									name="from_date" />
-							</div>
-							<div class="col">
-								<input
-									type="date"
-									class="form-control"
-									id="to_date"
-									name="to_date" />
-							</div>
-						</div>
+	<div class="col-9 mx-auto">
+		<form id="filterForm">
+			<div class="form-group">
+				<div class="row">
+					<div class="col">
+						<input
+							type="date"
+							class="form-control"
+							id="from_date"
+							name="from_date" />
 					</div>
-					<div class="form-group">
-						<div class="row">
-							<div class="col-md-9">
-								<input
-									type="text"
-									class="form-control"
-									id="search"
-									name="keyword"
-									placeholder="Enter keyword..." />
-							</div>
-							<div class="col-md-3">
-								<button
-									type="submit"
-									class="btn btn-primary w-100">
-									Filter
-								</button>
-							</div>
-						</div>
+					<div class="col">
+						<input
+							type="date"
+							class="form-control"
+							id="to_date"
+							name="to_date" />
 					</div>
-				</form>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="row">
+					<div class="col-md-9">
+						<input
+							type="text"
+							class="form-control"
+							id="search"
+							name="keyword"
+							placeholder="Enter keyword..." />
+					</div>
+					<div class="col-md-3">
+						<button
+							type="submit"
+							class="btn btn-primary w-100">
+							Filter
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="col-12">
+		<div class="row">
+			<div class="col-6">
+				<canvas id="categoryChart"></canvas>
+			</div>
+			<div class="col-6">
+				<select
+					class="custom-select w-50 mb-2"
+					id="typeChoices"></select>
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th scope="col">ID</th>
+							<th scope="col">Name</th>
+							<th scope="col">Amount</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for c in categories %}
+						<tr class="table-light">
+							<td>{{c[0] }}</td>
+							<td>{{c[1] }}</td>
+							<td>{{c[2] }}</td>
+						</tr>
+						{% endfor%}
+					</tbody>
+				</table>
 			</div>
 		</div>
 	</div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script>
+	const labels = [], data = [], backgroundColor = [], borderColor = [];
+	const chartTypes = [
+	    { value: 'bar', text: 'Bar Chart' },
+	    { value: 'line', text: 'Line Chart' },
+	    { value: 'bubble', text: 'Bubble Chart' },
+	    { value: 'doughnut', text: 'Doughnut Chart' },
+	];
+
+	{% for c in categories %}
+	    labels.push('{{ c[1] }}');
+	    data.push({{ c[2] }});
+	{% endfor %}
+
+	window.onload = () => {
+		const typeChoices = document.getElementById('typeChoices');
+	    chartTypes.forEach(type => {
+	        const option = document.createElement('option');
+	        option.value = type.value;
+	        option.textContent = type.text;
+	        typeChoices.appendChild(option);
+	    });
+
+		typeChoices.value = 'bar';
+
+	    for (let i = 0; i < labels.length; i++) {
+	        backgroundColor.push(generateRandomColor());
+	        borderColor.push(generateRandomColor(0));
+	    }
+
+	    const newCtx = document.getElementById('categoryChart').getContext('2d');
+	    let chartType = typeChoices.value;
+	    loadChart(newCtx, chartType, labels, "Statistical of the number of courses by category", "Amount", data, backgroundColor, borderColor);
+
+	    typeChoices.addEventListener('change', (event) => {
+	        chartType = event.target.value;
+	        loadChart(newCtx, chartType, labels, "Statistical of the number of courses by category", "Amount", data, backgroundColor, borderColor);
+	    });
+	}
+</script>
 {% endblock %}

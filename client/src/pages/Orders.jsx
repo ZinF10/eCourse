@@ -1,6 +1,6 @@
 import Each from "@/components/common/Each";
 import Loading from "@/components/common/Loading";
-import useFetch from "@/hooks/customs/useFetch";
+import useFetch from "@/hooks/customs/useAxios";
 import endpoints from "@/services/endpoints";
 import { formatPrice } from "@/utils/format";
 
@@ -32,7 +32,6 @@ const Orders = () => {
                                     <>
                                         <p>Course ID: #{detail.course.id}</p>
                                         <p>Subject: {detail.course.subject}</p>
-                                        <p>Quantity: {detail.quantity}</p>
                                         <p>
                                             Price: {formatPrice(detail.unit_price)}
                                         </p>

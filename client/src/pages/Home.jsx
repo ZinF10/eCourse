@@ -2,7 +2,7 @@ import Greeting from '@/components/common/Greeting';
 import Loading from '@/components/common/Loading';
 import CourseList from '@/components/containers/CourseList';
 import AuthContext from '@/hooks/contexts/AuthContext';
-import useFetch from '@/hooks/customs/useFetch';
+import useFetch from '@/hooks/customs/useAxios';
 import endpoints from '@/services/endpoints';
 import { useContext } from 'react';
 

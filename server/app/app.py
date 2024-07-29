@@ -1,7 +1,9 @@
-from app import app, resources, admin, login_manager, dao, jwt
-from flask import flash, redirect, request, url_for, jsonify
+from app import create_app, dao
+from .extensions import login_manager
+from flask import flash, redirect, request, url_for
 from flask_login import login_user
-from flask_jwt_extended import create_access_token, set_access_cookies, get_csrf_token
+
+app = create_app()
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -21,25 +23,3 @@ def admin_login():
 
     flash("Invalid email or password. Please try again.", category="warning")
     return redirect(url_for('admin.index'))
-
-@jwt.user_identity_loader
-def user_identity_lookup(user):
-    return user.id
-
-
-@jwt.user_lookup_loader
-def user_lookup_callback(_jwt_header, jwt_data):
-    return dao.load_user(id=jwt_data["sub"])
-
-
-@app.route("/token/", methods=["POST"])
-def get_token():
-    email = request.json.get("email")
-    password = request.json.get("password")
-
-    user = dao.load_user(email=email)
-    if not user or not user.check_password(password=password):
-        return jsonify(message="Wrong email or password"), 401
-
-    access_token = create_access_token(identity=user)
-    return jsonify(access_token=access_token), 200

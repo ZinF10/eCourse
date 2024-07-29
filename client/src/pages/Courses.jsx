@@ -1,7 +1,7 @@
 import Each from '@/components/common/Each';
 import Loading from '@/components/common/Loading';
 import useDocumentTitle from '@/hooks/customs/useDocumentTitle';
-import useFetch from '@/hooks/customs/useFetch';
+import useFetch from '@/hooks/customs/useAxios';
 import endpoints from '@/services/endpoints';
 import { Link, useLocation } from 'react-router-dom';
 

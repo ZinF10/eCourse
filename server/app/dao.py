@@ -1,6 +1,6 @@
-from app import db, cache
+from .extensions import db
 from .configs import Config
-from .models import User, Category, Course, Lesson, Order, OrderDetail
+from .models import User, Category, Course, Lesson, Order
 from sqlalchemy import func, extract
 
 def load_user(id=None, email=None, username=None):
@@ -18,20 +18,25 @@ def load_user(id=None, email=None, username=None):
     return queries.one_or_none()
 
 
-@cache.cached(timeout=(60*60*2))
 def load_categories():
     return Category.query.filter(Category.active.__eq__(True)).all()
-
+        
 
 def load_courses(
-    category=None, keyword=None,
-    from_price=None, to_price=None,
-    is_latest=False, release_month=None,
-    release_month_after=None, release_month_before=None,
-    page=1, per_page=Config.PAGE_SIZE
+    per_page=Config.PAGE_SIZE,
+    **kwargs
 ):
     queries = Course.query.filter(Course.active.__eq__(True))
 
+    category = kwargs.get('category')
+    keyword = kwargs.get('keyword')
+    from_price = kwargs.get('from_price')
+    to_price = kwargs.get('to_price')
+    release_month = kwargs.get('release_month')
+    release_month_after = kwargs.get('release_month_after')
+    release_month_before = kwargs.get('release_month_before')
+    page = kwargs.get('page')
+    
     if category:
         queries = queries.filter(Course.category_id.__eq__(category))
 
@@ -56,22 +61,10 @@ def load_courses(
         queries = queries.filter(
             extract('month', Course.date_created).__lt__(release_month_before))
 
-    if is_latest:
-        queries = queries.order_by(Course.date_created)
-    else:
-        queries = queries.order_by(Course.subject)
-
-    pagination = queries.paginate(
-        page=page, per_page=per_page)
-
-    return {
-        'courses': pagination.items,
-        'total_pages': pagination.pages,
-        'total_items': pagination.total,
-        'current_page': page,
-        'per_page': per_page
-    }
-
+    pagination = queries.paginate(page=page, per_page=per_page)
+    
+    return pagination.items
+    
 
 def load_course(course_id):
     return Course.query.get(int(course_id))
@@ -90,7 +83,6 @@ def load_lesson(lesson_id):
     return Lesson.query.get(int(lesson_id))
 
 
-
 def load_order(order_id):
     return Order.query.get(int(order_id))
 
@@ -104,7 +96,6 @@ def load_orders(user=None):
     return queries.all()
 
 
-@cache.cached(timeout=(60*60*2))
 def auth_user(email, password):
     user = User.query.filter(User.email.__eq__(email)).first()
     return user if user and user.check_password(password=password) and user.is_admin() else None

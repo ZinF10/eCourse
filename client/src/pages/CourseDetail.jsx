@@ -1,8 +1,8 @@
 import Each from '@/components/common/Each';
 import Loading from '@/components/common/Loading';
-import useFetch from '@/hooks/customs/useFetch';
+import useFetch from '@/hooks/customs/useAxios';
 import endpoints from '@/services/endpoints';
-import { Link,  useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import PageNotFound from './PageNotFound';
 
 const CourseDetail = () => {
@@ -21,7 +21,7 @@ const CourseDetail = () => {
 	}
 
 	if (error) {
-		return <PageNotFound/>;
+		return <PageNotFound />;
 	}
 
 	return (
