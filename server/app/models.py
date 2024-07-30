@@ -1,9 +1,10 @@
-import enum
+import enum 
 from .extensions import db
+from .utils import hash_avatar_url
 from sqlalchemy import Column, Integer, Boolean, DateTime, String, ForeignKey, Text, Float, Enum
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin
-from datetime import datetime
+from datetime import datetime, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -19,21 +20,34 @@ class BaseModel(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     active = Column(Boolean, default=True)
     date_created = Column(DateTime, default=datetime.utcnow)
-
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'active': self.active,
+            'date_created': self.date_created
+        }
+        
 
 class User(UserMixin, BaseModel):
-    avatar = Column(String(225), default=None)
     username = Column(String(80), unique=True)
     email = Column(String(125), unique=True)
     password = Column(String(255))
+    avatar = Column(String(225), default=None)
     first_name = Column(String(80))
     last_name = Column(String(80))
     phone = Column(String(10), nullable=True)
+    last_seen = Column(DateTime, default=datetime.now(timezone.utc))
     role = Column(Enum(Role), default=Role.STUDENT)
     orders = relationship('Order', backref='user', lazy=True)
     comments = relationship('Comment', backref='user', lazy=True)
     ratings = relationship('Rating', backref='user', lazy=True)
     likes = relationship('Like', backref='user', lazy=True)
+    
+    def __init__(self, *args, **kwargs):
+        super(User, self).__init__(*args, **kwargs)
+        if not self.avatar:
+            self.avatar = hash_avatar_url(email=self.email)
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -64,6 +78,13 @@ class Category(BaseModel):
 
     def __str__(self):
         return self.name
+    
+    def to_dict(self):
+        base_dict = super().to_dict()
+        base_dict.update({
+            'name': self.name,
+        })
+        return base_dict
 
 
 class Course(BaseModel):
@@ -175,3 +196,4 @@ class Like(db.Model):
 
     def __str__(self):
         return self.liked
+

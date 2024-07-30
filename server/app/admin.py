@@ -8,12 +8,12 @@ from wtforms import FileField
 from flask_login import current_user, logout_user
 from markupsafe import Markup
 from .configs import LocalConfig
-from .dao import stats_courses
-from .actions import change_active
+from .dao import stats_courses, count_courses
+from .actions import change_active, view_json
 from .decorators import admin_member_required
 from .widgets import CKTextAreaField
 from .models import Tag, Lesson, Order
-from .utils import format_price, upload_image
+from .utils import upload_image
 
 cdn_ckeditor = ['//cdn.ckeditor.com/4.6.0/full-all/ckeditor.js']
 
@@ -28,7 +28,9 @@ class AuthView(BaseView):
 class AdminView(AdminIndexView):
     @expose('/')
     def index(self):
-        return self.render('admin/index.html', categories=stats_courses())
+        return self.render('admin/index.html', 
+                        categories=stats_courses(),
+                        total_courses=count_courses())
 
 
 class LogoutView(AuthView):
@@ -42,7 +44,9 @@ class LogoutView(AuthView):
 class AnalyticsView(AuthView):
     @expose("/")
     def index(self):
-        return self.render("admin/analytics.html", categories=stats_courses())
+        return self.render("admin/analytics.html", 
+                        categories=stats_courses(),
+                        total_courses=count_courses())
 
 
 class UploadFileView(FileAdmin, AuthView):
@@ -65,6 +69,9 @@ class BaseModelView(AuthView, ModelView):
     def action_active(self, ids):
         return change_active(self=self, ids=ids)
     
+    @action('view_json', 'View JSON', 'Are you sure you want to view JSON data for the selected items?')
+    def view_json(self, ids):
+        return view_json(self=self, ids=ids)
         
 class CategoryView(BaseModelView):
     column_list = ["name", "courses"] + BaseModelView.column_list
@@ -94,10 +101,7 @@ class CourseView(BaseModelView):
             return '-Empty-'
         return Markup(f'<img src="{model.image}" alt="{model.subject}" width="80" height="80" class="img-thumbnail rounded-circle shadow" />')
     
-    def _format_price(view, context, model, name):
-        return format_price(amount=model.price)
-    
-    column_formatters = {'image': _list_thumbnail, 'price': _format_price}
+    column_formatters = {'image': _list_thumbnail}
     
     def on_model_change(self, form, model, is_created):
         if form.image.data:

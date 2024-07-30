@@ -5,7 +5,9 @@ from flask_login import LoginManager
 from flask_babel import Babel
 from flask_restx import Api
 from flask_cors import CORS
-from .utils import get_locale, get_timezone
+from flask_mail import Mail
+from flask_debugtoolbar import DebugToolbarExtension
+from .utils import get_locale
 from .configs import Config
 
 db = SQLAlchemy()
@@ -36,5 +38,7 @@ api = Api(
     validate=True,
     ordered=True
 )
-admin_manager = Admin(name='eCourse', template_mode='bootstrap4')
-babel = Babel(locale_selector=get_locale, timezone_selector=get_timezone)
+admin_manager = Admin(name=Config.SWAGGER_UI_OAUTH_APP_NAME, template_mode='bootstrap4')
+babel = Babel(locale_selector=get_locale)
+toolbar = DebugToolbarExtension()
+mail = Mail()

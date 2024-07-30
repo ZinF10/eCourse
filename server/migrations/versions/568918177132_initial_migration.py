@@ -1,8 +1,8 @@
-"""Initial migration
+"""Initial migration.
 
-Revision ID: 9e406d942027
+Revision ID: 568918177132
 Revises: 
-Create Date: 2024-07-26 03:24:26.927554
+Create Date: 2024-07-30 11:04:25.882468
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '9e406d942027'
+revision = '568918177132'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -35,13 +35,14 @@ def upgrade():
     sa.UniqueConstraint('name')
     )
     op.create_table('user',
-    sa.Column('avatar', sa.String(length=225), nullable=True),
     sa.Column('username', sa.String(length=80), nullable=True),
     sa.Column('email', sa.String(length=125), nullable=True),
     sa.Column('password', sa.String(length=255), nullable=True),
+    sa.Column('avatar', sa.String(length=225), nullable=True),
     sa.Column('first_name', sa.String(length=80), nullable=True),
     sa.Column('last_name', sa.String(length=80), nullable=True),
     sa.Column('phone', sa.String(length=10), nullable=True),
+    sa.Column('last_seen', sa.DateTime(), nullable=True),
     sa.Column('role', sa.Enum('ADMIN', 'STUDENT', 'INSTRUCTOR', name='role'), nullable=True),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('active', sa.Boolean(), nullable=True),

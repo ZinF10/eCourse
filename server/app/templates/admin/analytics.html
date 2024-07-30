@@ -1,77 +1,73 @@
 {% extends 'admin/master.html' %} {% block body %}
 <h2 class="my-4 text-center">Analytics & Statistics</h2>
 
-<div class="row">
-	<div class="col-9 mx-auto">
-		<form id="filterForm">
-			<div class="form-group">
-				<div class="row">
-					<div class="col">
-						<input
-							type="date"
-							class="form-control"
-							id="from_date"
-							name="from_date" />
-					</div>
-					<div class="col">
-						<input
-							type="date"
-							class="form-control"
-							id="to_date"
-							name="to_date" />
-					</div>
-				</div>
-			</div>
-			<div class="form-group">
-				<div class="row">
-					<div class="col-md-9">
-						<input
-							type="text"
-							class="form-control"
-							id="search"
-							name="keyword"
-							placeholder="Enter keyword..." />
-					</div>
-					<div class="col-md-3">
-						<button
-							type="submit"
-							class="btn btn-primary w-100">
-							Filter
-						</button>
-					</div>
-				</div>
-			</div>
-		</form>
+<form
+	id="filterForm"
+	class="d-flex justify-content-center">
+	<div class="form-group mx-2">
+		<input
+			type="date"
+			class="form-control"
+			id="from_date"
+			name="from_date" />
 	</div>
-	<div class="col-12">
-		<div class="row">
-			<div class="col-6">
-				<canvas id="categoryChart"></canvas>
-			</div>
-			<div class="col-6">
-				<select
-					class="custom-select w-50 mb-2"
-					id="typeChoices"></select>
-				<table class="table table-hover">
-					<thead>
-						<tr>
-							<th scope="col">ID</th>
-							<th scope="col">Name</th>
-							<th scope="col">Amount</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for c in categories %}
-						<tr class="table-light">
-							<td>{{c[0] }}</td>
-							<td>{{c[1] }}</td>
-							<td>{{c[2] }}</td>
-						</tr>
-						{% endfor%}
-					</tbody>
-				</table>
-			</div>
-		</div>
+	<div class="form-group mx-2">
+		<input
+			type="date"
+			class="form-control"
+			id="to_date"
+			name="to_date" />
+	</div>
+	<div class="form-group mx-2">
+		<input
+			type="text"
+			class="form-control"
+			id="search"
+			name="keyword"
+			placeholder="Enter keyword..." />
+	</div>
+	<div class="form-group mx-2">
+		<button
+			type="submit"
+			class="btn btn-primary">
+			Filter
+		</button>
+	</div>
+</form>
+
+<div class="row">
+	<div class="col-6">
+		<canvas id="categoryChart"></canvas>
+	</div>
+	<div class="col-6">
+		<select
+			class="custom-select w-50 mb-2"
+			id="typeChoices"></select>
+		<table class="table table-hover table-bordered">
+			<caption>
+				Statistical of the number of courses by category
+			</caption>
+			<thead class="bg-primary">
+				<tr>
+					<th scope="col">ID</th>
+					<th scope="col">Name</th>
+					<th scope="col">Amount</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for c in categories %}
+				<tr class="table-light">
+					<td>{{c[0] }}</td>
+					<td>{{c[1] }}</td>
+					<td>{{c[2] }}</td>
+				</tr>
+				{% endfor%}
+				<tr class="table-light">
+					<th colspan="2">Total</th>
+					<td>{{total_courses}}</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 </div>
 
@@ -84,6 +80,10 @@
 	    { value: 'line', text: 'Line Chart' },
 	    { value: 'bubble', text: 'Bubble Chart' },
 	    { value: 'doughnut', text: 'Doughnut Chart' },
+		{ value: 'pie', text: 'Pie Chart' },
+		{ value: 'polarArea', text: 'Polar Area Chart' },
+		{ value: 'radar', text: 'Radar Chart' },
+		{ value: 'scatter', text: 'Scatter Chart' }
 	];
 
 	{% for c in categories %}
@@ -104,7 +104,7 @@
 
 	    for (let i = 0; i < labels.length; i++) {
 	        backgroundColor.push(generateRandomColor());
-	        borderColor.push(generateRandomColor(0));
+	        borderColor.push(generateRandomColor(0.5));
 	    }
 
 	    const newCtx = document.getElementById('categoryChart').getContext('2d');

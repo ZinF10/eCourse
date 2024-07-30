@@ -1,6 +1,5 @@
-from .extensions import db
 from .configs import Config
-from .models import User, Category, Course, Lesson, Order
+from .models import db, User, Category, Course, Lesson, Order
 from sqlalchemy import func, extract
 
 def load_user(id=None, email=None, username=None):
@@ -111,3 +110,10 @@ def stats_courses():
     return db.session.query(Category.id, Category.name, func.count(Course.id))\
         .join(Course, Course.category_id.__eq__(Category.id), isouter=True)\
         .group_by(Category.id).all()
+        
+
+def count_courses():
+    """
+        SELECT COUNT(*) AS total_courses FROM course;
+    """
+    return Course.query.count()

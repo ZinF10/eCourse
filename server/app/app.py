@@ -1,13 +1,21 @@
 from app import create_app, dao
-from .extensions import login_manager
+from .extensions import login_manager, db
 from flask import flash, redirect, request, url_for
-from flask_login import login_user
+from flask_login import login_user, current_user
+from datetime import datetime, timezone
 
 app = create_app()
 
 @login_manager.user_loader
 def load_user(user_id):
     return dao.load_user(id=user_id)
+
+
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.now(timezone.utc)
+        db.session.commit()
 
 
 @app.route("/admin-login", methods=['POST'])

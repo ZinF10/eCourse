@@ -1,7 +1,7 @@
 from flask_restx import fields, reqparse
 from .extensions import api
 
-base_model = api.model('Models', {
+base_model = api.model('Base Model', {
     'id': fields.Integer(readonly=True, description='Unique ID'),
     'active': fields.Boolean(description='Active'),
     'date_created': fields.DateTime(dt_format='iso8601'),
@@ -11,12 +11,19 @@ category_model = api.inherit('Category', base_model, {
     'name': fields.String,
 })
 
-course_model = api.inherit('Course', base_model, {
+common_model = api.model('Common Model', base_model, {
     'subject': fields.String,
-    'price': fields.Float,
     'image': fields.String,
-    'category': fields.String,
-    'tags': fields.List(fields.String, description='List of tags associated with the course')
+    'tags': fields.List(fields.String, description='List of tags')
+})
+
+course_model = api.inherit('Course', common_model, {
+    'price': fields.Float,
+    'category': fields.String
+})
+
+lesson_model = api.inherit('Lesson', common_model, {
+    'course': fields.String,
 })
 
 course_details_model = api.inherit('Course Details', course_model, {

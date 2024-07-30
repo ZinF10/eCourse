@@ -66,6 +66,12 @@ DB_PASSWORD=<password>
 DB_HOST=<host>
 ```
 
+Write UnitTest basic
+
+```bash
+python -m unittest app.tests
+```
+
 ## Author
 
 Copyright &copy; 2024 by [ZIN](http://www.github.com/zinitdev)
