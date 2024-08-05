@@ -1,76 +1,78 @@
+import { Card, CardBody } from "react-bootstrap"
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import useAuth from '@/hooks/customs/useAuth';
-import { useNavigate } from 'react-router-dom';
-import useDocumentTitle from '@/hooks/customs/useDocumentTitle';
+import useAuth from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const schema = yup
-	.object()
-	.shape({
-		email: yup
-			.string()
-			.email('Invalid email')
-			.required('Email is required'),
-		password: yup.string().required('Password is required'),
-	})
-	.required();
+    .object()
+    .shape({
+        email: yup
+            .string()
+            .email('Invalid email')
+            .required('Email is required'),
+        password: yup.string().required('Password is required'),
+    })
+    .required();
 
 const LogIn = () => {
-	useDocumentTitle('Log In - eCourse 🎓')
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(schema),
+    });
 
-	const {
-		register,
-		handleSubmit,
-		formState: { errors },
-	} = useForm({
-		resolver: yupResolver(schema),
-	});
+    const { login, isAuthenticated } = useAuth();
+    const navigate = useNavigate();
 
-	const { login, isAuthenticated } = useAuth();
-	const navigate = useNavigate();
+    const onSubmit = async (data) => {
+        const success = await login(data.email, data.password);
 
-	const onSubmit = async (data) => {
-		const success = await login(data.email, data.password);
+        success && (isAuthenticated() ?? navigate('/'))
+    };
 
-		success && (isAuthenticated() ?? navigate('/'))
-	};
+    return (
+        <div>
+            <h1>Log In</h1>
+            <Card>
+                <CardBody>
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <div className='form-group'>
+                            <label>Email</label>
+                            <input
+                                type='email'
+                                {...register('email')}
+                            />
+                            {errors.email && (
+                                <span>
+                                    {errors.email.message}
+                                </span>
+                            )}
+                        </div>
+                        <div className='form-group'>
+                            <label>Password</label>
+                            <input
+                                type='password'
+                                {...register('password')}
+                            />
+                            {errors.password && (
+                                <span>
+                                    {
+                                        errors.password
+                                            .message
+                                    }
+                                </span>
+                            )}
+                        </div>
+                        <button type='submit'>Log In</button>
+                    </form>
+                </CardBody>
+            </Card>
+        </div>
+    )
+}
 
-	return (
-		<section>
-			<h2>Log In</h2>
-			<form onSubmit={handleSubmit(onSubmit)}>
-				<div className='form-group'>
-					<label>Email</label>
-					<input
-						type='email'
-						{...register('email')}
-					/>
-					{errors.email && (
-						<span>
-							{errors.email.message}
-						</span>
-					)}
-				</div>
-				<div className='form-group'>
-					<label>Password</label>
-					<input
-						type='password'
-						{...register('password')}
-					/>
-					{errors.password && (
-						<span>
-							{
-								errors.password
-									.message
-							}
-						</span>
-					)}
-				</div>
-				<button type='submit'>Log In</button>
-			</form>
-		</section>
-	);
-};
-
-export default LogIn;
+export default LogIn

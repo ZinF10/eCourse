@@ -64,6 +64,8 @@ API_SECRET=<api_secret>
 DB_USERNAME=<username>
 DB_PASSWORD=<password>
 DB_HOST=<host>
+MAIL_USERNAME=<your_email>
+MAIL_PASSWORD=<your_password>
 ```
 
 Write UnitTest basic

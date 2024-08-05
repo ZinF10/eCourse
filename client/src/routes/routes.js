@@ -1,71 +1,31 @@
-import About from '@/pages/About';
-import CourseDetail from '@/pages/CourseDetail';
-import Courses from '@/pages/Courses';
-import Home from '@/pages/Home';
-import LessonDetail from '@/pages/LessonDetail';
-import LogIn from '@/pages/LogIn';
-import Orders from '@/pages/Orders';
-import PageNotFound from '@/pages/PageNotFound';
-import Profile from '@/pages/Profile';
-import Register from '@/pages/Register';
+import { lazy } from 'react';
+
+const Home = lazy(() => import('@/pages/Home'));
+const Courses = lazy(() => import('@/pages/Courses'));
+const Course = lazy(() => import('@/pages/Course'));
+const About = lazy(() => import('@/pages/About'));
+const SignUp = lazy(() => import('@/pages/SignUp'));
+const LogIn = lazy(() => import('@/pages/LogIn'));
+const Profile = lazy(() => import('@/pages/Profile'));
+const Cart = lazy(() => import('@/pages/Cart'));
+const NoMatch = lazy(() => import('@/pages/NoMatch'));
 
 const PublicRoutes = [
-	{
-		path: '/',
-		exact: true,
-		component: Home,
-		lazy: () => import('@/pages/Home'),
-	},
-	{
-		path: '/about',
-		component: About,
-		lazy: () => import('@/pages/About'),
-	},
-	{
-		path: '/login',
-		exact: true,
-		component: LogIn,
-		lazy: () => import('@/pages/LogIn'),
-	},
-	{
-		path: '/register',
-		component: Register,
-		lazy: () => import('@/pages/Register'),
-	},
-	{
-		path: '/courses',
-		component: Courses,
-		lazy: () => import('@/pages/Courses'),
-	},
-	{
-		path: '/courses/:id',
-		component: CourseDetail,
-		lazy: () => import('@/pages/CourseDetail'),
-	},
-	{
-		path: '/courses/:id/lessons/:lesson_id',
-		component: LessonDetail,
-		lazy: () => import('@/pages/LessonDetail'),
-	},
-	{
-		path: '*',
-		component: PageNotFound,
-		lazy: () => import('@/pages/PageNotFound'),
-	},
+    { path: '/', component: Home },
+    { path: '/courses', component: Courses },
+    { path: '/courses/:id', component: Course },
+    { path: '/about', component: About },
+    { path: '/sign-up', component: SignUp },
+    { path: '/login', component: LogIn },
+    { path: '/cart', component: Cart },
+    { path: '*', component: NoMatch },
 ];
-
 
 const PrivateRoutes = [
-	{
-		path: '/profile',
-		component: Profile,
-		lazy: () => import('@/pages/Profile'),
-	},
-	{
-		path: '/orders',
-		component: Orders,
-		lazy: () => import('@/pages/Orders'),
-	},
+    {
+        path: '/profile',
+        component: Profile
+    },
 ];
 
-export { PrivateRoutes, PublicRoutes };
+export { PublicRoutes, PrivateRoutes };

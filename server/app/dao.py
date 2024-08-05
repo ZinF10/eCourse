@@ -2,19 +2,9 @@ from .configs import Config
 from .models import db, User, Category, Course, Lesson, Order
 from sqlalchemy import func, extract
 
-def load_user(id=None, email=None, username=None):
-    queries = User.query.filter(User.active.__eq__(True))
 
-    if id:
-        queries = queries.filter(User.id.__eq__(id))
-    
-    if email:
-        queries = queries.filter(User.email.__eq__(email))
-
-    if username:
-        queries = queries.filter(User.username.__eq__(username))
-
-    return queries.one_or_none()
+def load_user(id=None):
+    return User.query.filter(User.active.__eq__(True), User.id.__eq__(id)).one_or_none()
 
 
 def load_categories():
@@ -23,6 +13,7 @@ def load_categories():
 
 def load_courses(
     per_page=Config.PAGE_SIZE,
+    latest=False,
     **kwargs
 ):
     queries = Course.query.filter(Course.active.__eq__(True))
@@ -34,7 +25,7 @@ def load_courses(
     release_month = kwargs.get('release_month')
     release_month_after = kwargs.get('release_month_after')
     release_month_before = kwargs.get('release_month_before')
-    page = kwargs.get('page')
+    page = kwargs.get('page', 1)
     
     if category:
         queries = queries.filter(Course.category_id.__eq__(category))
@@ -60,8 +51,11 @@ def load_courses(
         queries = queries.filter(
             extract('month', Course.date_created).__lt__(release_month_before))
 
+    if latest:
+        queries = queries.order_by(Course.date_created.desc())
+        return queries.limit(4).all()
+        
     pagination = queries.paginate(page=page, per_page=per_page)
-    
     return pagination.items
     
 
@@ -95,9 +89,26 @@ def load_orders(user=None):
     return queries.all()
 
 
-def auth_user(email, password):
+def create_user(username, email, password, **kwargs):
+    user = User(
+        username=username,
+        email=email,
+        **kwargs
+    )
+    user.set_password(password=password)
+    user.save()
+    return user
+
+
+def auth_user(email, password, role=None):
     user = User.query.filter(User.email.__eq__(email)).first()
-    return user if user and user.check_password(password=password) and user.is_admin() else None
+    
+    if user and user.check_password(password=password):
+        if role is None:
+            return user 
+        elif role == 'admin' and user.is_admin():
+            return user
+    return None
 
 
 def stats_courses():

@@ -3,6 +3,7 @@ from flask_mail import Message
 from flask import request, session
 from .configs import Config
 
+
 def get_locale():
     if request.args.get('lang'):
         session['lang'] = request.args.get('lang')

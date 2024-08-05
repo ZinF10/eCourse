@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, Boolean, DateTime, String, ForeignKey, T
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin
 from datetime import datetime, timezone
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask_bcrypt import generate_password_hash, check_password_hash
 
 
 class Role(enum.Enum):
@@ -27,6 +27,10 @@ class BaseModel(db.Model):
             'active': self.active,
             'date_created': self.date_created
         }
+    
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
         
 
 class User(UserMixin, BaseModel):
@@ -34,8 +38,8 @@ class User(UserMixin, BaseModel):
     email = Column(String(125), unique=True)
     password = Column(String(255))
     avatar = Column(String(225), default=None)
-    first_name = Column(String(80))
-    last_name = Column(String(80))
+    first_name = Column(String(80), nullable=True)
+    last_name = Column(String(80), nullable=True)
     phone = Column(String(10), nullable=True)
     last_seen = Column(DateTime, default=datetime.now(timezone.utc))
     role = Column(Enum(Role), default=Role.STUDENT)
@@ -48,9 +52,15 @@ class User(UserMixin, BaseModel):
         super(User, self).__init__(*args, **kwargs)
         if not self.avatar:
             self.avatar = hash_avatar_url(email=self.email)
+            
+        if self.role == Role.INSTRUCTOR and not self.password:
+            self.set_password('123')
+            
+        if self.role == Role.ADMIN and not self.password:
+            self.set_password('admin')
 
     def set_password(self, password):
-        self.password = generate_password_hash(password)
+        self.password = generate_password_hash(password, 10)
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
@@ -73,7 +83,7 @@ class Instructor(BaseModel):
 
 
 class Category(BaseModel):
-    name = Column(String(80), unique=True)
+    name = Column(String(80), unique=True, nullable=False)
     courses = relationship('Course', backref='category', lazy=True)
 
     def __str__(self):
@@ -88,7 +98,7 @@ class Category(BaseModel):
 
 
 class Course(BaseModel):
-    subject = Column(String(100), unique=True)
+    subject = Column(String(100), unique=True, nullable=False)
     description = Column(Text)
     image = Column(String(255), default=None)
     price = Column(Float, default=0.00)
@@ -106,7 +116,7 @@ class Course(BaseModel):
 
 
 class Lesson(BaseModel):
-    subject = Column(String(100), unique=True)
+    subject = Column(String(100), unique=True, nullable=False)
     content = Column(Text)
     image = Column(String(255), default=None)
     course_id = Column(Integer, ForeignKey(Course.id), nullable=False)
@@ -187,12 +197,8 @@ class Rating(InteractionModel):
         return self.rate
 
 
-class Like(db.Model):
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
-    course_id = Column(Integer, ForeignKey(Course.id), nullable=False)
+class Like(InteractionModel):
     liked = Column(Boolean, default=False)
-    date_created = Column(DateTime, default=datetime.utcnow())
 
     def __str__(self):
         return self.liked

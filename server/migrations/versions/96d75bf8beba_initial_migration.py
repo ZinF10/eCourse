@@ -1,8 +1,8 @@
-"""Initial migration.
+"""Initial migration
 
-Revision ID: 568918177132
+Revision ID: 96d75bf8beba
 Revises: 
-Create Date: 2024-07-30 11:04:25.882468
+Create Date: 2024-08-05 12:10:36.193650
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '568918177132'
+revision = '96d75bf8beba'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -76,12 +76,14 @@ def upgrade():
     sa.Column('price', sa.Float(), nullable=True),
     sa.Column('category_id', sa.Integer(), nullable=False),
     sa.Column('instructor_id', sa.Integer(), nullable=True),
+    sa.Column('slug', sa.String(length=255), nullable=True),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('active', sa.Boolean(), nullable=True),
     sa.Column('date_created', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['category_id'], ['category.id'], ),
     sa.ForeignKeyConstraint(['instructor_id'], ['instructor.id'], ),
     sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('slug'),
     sa.UniqueConstraint('subject')
     )
     op.create_table('comment',
@@ -106,18 +108,21 @@ def upgrade():
     sa.Column('content', sa.Text(), nullable=True),
     sa.Column('image', sa.String(length=255), nullable=True),
     sa.Column('course_id', sa.Integer(), nullable=False),
+    sa.Column('slug', sa.String(length=255), nullable=True),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('active', sa.Boolean(), nullable=True),
     sa.Column('date_created', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['course_id'], ['course.id'], ),
     sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('slug'),
     sa.UniqueConstraint('subject')
     )
     op.create_table('like',
-    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('liked', sa.Boolean(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('course_id', sa.Integer(), nullable=False),
-    sa.Column('liked', sa.Boolean(), nullable=True),
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('active', sa.Boolean(), nullable=True),
     sa.Column('date_created', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['course_id'], ['course.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),

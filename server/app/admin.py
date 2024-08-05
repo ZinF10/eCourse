@@ -79,30 +79,21 @@ class CategoryView(BaseModelView):
     column_editable_list = ["name"] + BaseModelView.column_editable_list
     
 
-class CourseView(BaseModelView):
-    column_list = ["subject", "image", "price", "category"
-            ] + BaseModelView.column_list
-    inline_models = [Lesson, Tag]
-    column_searchable_list = ["subject"]
-    column_editable_list = ["subject", "price", "category"] + \
-        BaseModelView.column_editable_list
-    column_sortable_list = ["subject", "price"] + \
-        BaseModelView.column_sortable_list
-    column_filters = ["price"] + BaseModelView.column_filters
+class BaseCustomView(BaseModelView):
     extra_js = cdn_ckeditor
     
     form_overrides = {
         'description': CKTextAreaField,
         'image': FileField
     }
-    
+
     def _list_thumbnail(view, context, model, name):
         if not model.image:
             return '-Empty-'
         return Markup(f'<img src="{model.image}" alt="{model.subject}" width="80" height="80" class="img-thumbnail rounded-circle shadow" />')
-    
+
     column_formatters = {'image': _list_thumbnail}
-    
+
     def on_model_change(self, form, model, is_created):
         if form.image.data:
             file_data = form.image.data
@@ -112,8 +103,30 @@ class CourseView(BaseModelView):
                     model.image = upload_image(file_data=file_data)
                 except:
                     model.image = None
-        super(CourseView, self).on_model_change(form, model, is_created)
-    
+        super(BaseCustomView, self).on_model_change(form, model, is_created)
+
+
+class CourseView(BaseCustomView):
+    column_list = ["subject", "image", "price", "category"
+            ] + BaseCustomView.column_list
+    inline_models = [Lesson, Tag]
+    column_searchable_list = ["subject"]
+    column_editable_list = ["subject", "price", "category"] + \
+        BaseCustomView.column_editable_list
+    column_sortable_list = ["subject", "price"] + \
+        BaseCustomView.column_sortable_list
+    column_filters = ["price"] + BaseCustomView.column_filters
+
+
+class LessonView(BaseCustomView):
+    column_list = ["subject", "image", "course"
+            ] + BaseCustomView.column_list
+    column_searchable_list = ["subject"]
+    column_editable_list = ["subject", "course"] + \
+        BaseCustomView.column_editable_list
+    column_sortable_list = ["subject"] + \
+        BaseCustomView.column_sortable_list
+        
     
 class TagView(BaseModelView):
     column_list = ["name", "courses"] + BaseModelView.column_list

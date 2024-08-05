@@ -1,59 +1,12 @@
-import Each from '@/components/common/Each';
-import Loading from '@/components/common/Loading';
-import useDocumentTitle from '@/hooks/customs/useDocumentTitle';
-import useFetch from '@/hooks/customs/useAxios';
-import endpoints from '@/services/endpoints';
-import { Link, useLocation } from 'react-router-dom';
+import CourseList from "@/components/containers/CourseList"
 
 const Courses = () => {
-	useDocumentTitle('Courses - eCourse 🎓')
-	const location = useLocation();
-	const queryParams = new URLSearchParams(location.search);
-	const category = queryParams.get('category');
-	const keyword = queryParams.get('keyword');
-	const { data, isLoading, error } = useFetch(
-		endpoints['courses'](keyword, category),
-	);
+    return (
+        <section className="py-2">
+            <h2>Courses</h2>
+            <CourseList />
+        </section>
+    )
+}
 
-	if (isLoading) {
-		return <Loading />;
-	}
-
-	if (error) {
-		return <p>{error}</p>;
-	}
-
-	return (
-		<section>
-			<h1>Courses</h1>
-			{data && data.length > 0 ? (
-				<Each
-					of={data}
-					render={(item, index) => (
-						<li key={index}>
-							<Link to={`${item.id}`}>
-								{item.subject}
-							</Link>
-							<p>
-								Price: $
-								{item.price}
-							</p>
-							<p>
-								Category:{' '}
-								<i>
-									{
-										item.category
-									}
-								</i>
-							</p>
-						</li>
-					)}
-				/>
-			) : (
-				<p>No items exists</p>
-			)}
-		</section>
-	);
-};
-
-export default Courses;
+export default Courses
