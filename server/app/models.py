@@ -1,30 +1,25 @@
-import enum 
-from .extensions import db
-from .utils import hash_avatar_url
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from sqlalchemy import Column, Integer, Boolean, DateTime, String, ForeignKey, Text, Float, Enum
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin
 from datetime import datetime, timezone
 from flask_bcrypt import generate_password_hash, check_password_hash
+from .utils.helpers import hash_avatar_url
 
-
-class Role(enum.Enum):
-    ADMIN = 'Administrator'
-    STUDENT = 'Student'
-    INSTRUCTOR = 'Instructor'
-
-
+db = SQLAlchemy()
+migrate = Migrate()
 class BaseModel(db.Model):
     __abstract__ = True
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    active = Column(Boolean, default=True)
+    is_active = Column(Boolean, default=True)
     date_created = Column(DateTime, default=datetime.utcnow)
     
     def to_dict(self):
         return {
             'id': self.id,
-            'active': self.active,
+            'is_active': self.is_active,
             'date_created': self.date_created
         }
     
@@ -33,7 +28,7 @@ class BaseModel(db.Model):
         db.session.commit()
         
 
-class User(UserMixin, BaseModel):
+class User(BaseModel, UserMixin):
     username = Column(String(80), unique=True)
     email = Column(String(125), unique=True)
     password = Column(String(255))
@@ -42,7 +37,7 @@ class User(UserMixin, BaseModel):
     last_name = Column(String(80), nullable=True)
     phone = Column(String(10), nullable=True)
     last_seen = Column(DateTime, default=datetime.now(timezone.utc))
-    role = Column(Enum(Role), default=Role.STUDENT)
+    is_admin = Column(Boolean, default=False)
     orders = relationship('Order', backref='user', lazy=True)
     comments = relationship('Comment', backref='user', lazy=True)
     ratings = relationship('Rating', backref='user', lazy=True)
@@ -50,23 +45,26 @@ class User(UserMixin, BaseModel):
     
     def __init__(self, *args, **kwargs):
         super(User, self).__init__(*args, **kwargs)
+        self.password = generate_password_hash(kwargs.get('password'), 10)
         if not self.avatar:
             self.avatar = hash_avatar_url(email=self.email)
-            
-        if self.role == Role.INSTRUCTOR and not self.password:
-            self.set_password('123')
-            
-        if self.role == Role.ADMIN and not self.password:
-            self.set_password('admin')
-
-    def set_password(self, password):
-        self.password = generate_password_hash(password, 10)
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
-
-    def is_admin(self):
-        return self.role == Role.ADMIN
+    
+    def to_dict(self):
+        base_dict = super().to_dict()
+        base_dict.update({
+            'username': self.username,
+            'email': self.email,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'avatar': self.avatar,
+            'phone': self.phone,
+            'is_admin': self.is_admin,
+            'last_seen': self.last_seen
+        })
+        return base_dict
 
     def __str__(self):
         return f'{self.last_name} {self.first_name}'
@@ -139,6 +137,13 @@ class Resource(BaseModel):
 class Tag(BaseModel):
     name = Column(String(80), unique=True)
 
+    def to_dict(self):
+        base_dict = super().to_dict()
+        base_dict.update({
+            'name': self.name,
+        })
+        return base_dict
+
     def __str__(self):
         return f"#{self.name}"
 
@@ -198,8 +203,8 @@ class Rating(InteractionModel):
 
 
 class Like(InteractionModel):
-    liked = Column(Boolean, default=False)
+    is_liked = Column(Boolean, default=False)
 
     def __str__(self):
-        return self.liked
+        return self.is_liked
 

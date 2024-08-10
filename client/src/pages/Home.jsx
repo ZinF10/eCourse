@@ -16,9 +16,9 @@ const Home = () => {
             </section>
             <hr className='divider py-2'></hr>
             <section className="py-2" aria-labelledby="about-us">
-                <h2 id="about-us">About Us</h2>
-                <Row className='align-items-center'>
+                <Row>
                     <Col md={6}>
+                        <h2 id="about-us">About Us</h2>
                         <p className='text-body-tertiary'><strong className="text-dark">eCourse</strong> is a leading online learning platform with thousands of high-quality courses. We are committed to providing the best learning experience for our students.</p>
                     </Col>
                     <Col md={6}>

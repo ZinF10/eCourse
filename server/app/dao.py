@@ -1,14 +1,14 @@
-from .configs import Config
-from .models import db, User, Category, Course, Lesson, Order
 from sqlalchemy import func, extract
+from .models import db, Category, Course, User, Lesson
+from .configs import Config
 
 
-def load_user(id=None):
-    return User.query.filter(User.active.__eq__(True), User.id.__eq__(id)).one_or_none()
+def fetch_user(id=None):
+    return User.query.filter(User.is_active.__eq__(True), User.id.__eq__(id)).first()
 
 
 def load_categories():
-    return Category.query.filter(Category.active.__eq__(True)).all()
+    return Category.query.filter(Category.is_active.__eq__(True)).all()
         
 
 def load_courses(
@@ -16,7 +16,7 @@ def load_courses(
     latest=False,
     **kwargs
 ):
-    queries = Course.query.filter(Course.active.__eq__(True))
+    queries = Course.query.filter(Course.is_active.__eq__(True))
 
     category = kwargs.get('category')
     keyword = kwargs.get('keyword')
@@ -64,7 +64,7 @@ def load_course(course_id):
 
 
 def load_lessons(course=None, lesson=None):
-    queries = Lesson.query.filter(Lesson.active.__eq__(True))
+    queries = Lesson.query.filter(Lesson.is_active.__eq__(True))
 
     if course:
         queries = queries.filter(Lesson.course_id.__eq__(course))
@@ -76,40 +76,34 @@ def load_lesson(lesson_id):
     return Lesson.query.get(int(lesson_id))
 
 
-def load_order(order_id):
-    return Order.query.get(int(order_id))
+# def load_order(order_id):
+#     return Order.query.get(int(order_id))
 
 
-def load_orders(user=None):
-    queries = Order.query
+# def load_orders(user=None):
+#     queries = Order.query
     
-    if user:
-        queries = queries.filter(Order.user_id.__eq__(user))
+#     if user:
+#         queries = queries.filter(Order.user_id.__eq__(user))
     
-    return queries.all()
+#     return queries.all()
 
 
 def create_user(username, email, password, **kwargs):
     user = User(
         username=username,
         email=email,
+        password=password,
         **kwargs
     )
-    user.set_password(password=password)
     user.save()
     return user
 
 
-def auth_user(email, password, role=None):
+def auth_user(email, password):
     user = User.query.filter(User.email.__eq__(email)).first()
+    return user if user and user.check_password(password=password) else None
     
-    if user and user.check_password(password=password):
-        if role is None:
-            return user 
-        elif role == 'admin' and user.is_admin():
-            return user
-    return None
-
 
 def stats_courses():
     """

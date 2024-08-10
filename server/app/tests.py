@@ -3,11 +3,11 @@ from app import create_app
 from .models import db, User
 from .configs import TestingConfig
 
-class UserModelCase(unittest.TestCase):
+class BaseTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app(TestingConfig)
         self.app_context = self.app.app_context()
-        self.app_context.push()
+        self.app_context.push()        
         db.create_all()
 
     # def tearDown(self):
@@ -16,11 +16,10 @@ class UserModelCase(unittest.TestCase):
     #     self.app_context.pop()
 
     def test_password(self):
-        u = User(username='ZIN', email='zin.it.dev@gmail.com')
-        u.set_password('hello')
+        u = User(username='ZIN', email='zin.it.dev@gmail.com', password="hello")
         self.assertFalse(u.check_password('dog'))
         self.assertTrue(u.check_password('hello'))
-        
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

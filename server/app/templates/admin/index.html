@@ -1,6 +1,6 @@
 {% extends 'admin/master.html' %}
 <div class="mt-4">
-	{% block body %} {% if current_user.is_authenticated and current_user.is_admin() %}
+	{% block body %} {% if current_user.is_authenticated and current_user.is_admin %}
 	<div class="jumbotron">
 		<h1 class="display-5">Welcome to eStory Administrator Dashboard</h1>
 		<p class="lead">Manage your courses, users, orders, and more from here.</p>

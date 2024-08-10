@@ -1,20 +1,10 @@
 import { Card, CardBody } from "react-bootstrap"
 import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import useAuth from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { loginSchema } from "@/utils/schemas";
 
-const schema = yup
-    .object()
-    .shape({
-        email: yup
-            .string()
-            .email('Invalid email')
-            .required('Email is required'),
-        password: yup.string().required('Password is required'),
-    })
-    .required();
 
 const LogIn = () => {
     const {
@@ -22,7 +12,7 @@ const LogIn = () => {
         handleSubmit,
         formState: { errors },
     } = useForm({
-        resolver: yupResolver(schema),
+        resolver: yupResolver(loginSchema),
     });
 
     const { login, isAuthenticated } = useAuth();
