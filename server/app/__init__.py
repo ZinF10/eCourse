@@ -10,25 +10,31 @@ from .apis import api
 from .admin import admin_manager, babel
 from .services.caching import cache
 
-app = Flask(__name__)
-app.config.from_object(DevelopmentConfig)
+jwt = JWTManager()
+login_manager = LoginManager()
 
-api.init_app(app=app)
-db.init_app(app=app)
-babel.init_app(app=app)
-
-jwt = JWTManager(app=app)
-cors = CORS(app=app, resources={r"/*": {"origins": "*"}})
-login_manager = LoginManager(app=app)
-migrate = Migrate(app=app, db=db, render_as_batch=False)
-
-admin_manager.init_app(app=app)
-cache.init_app(app=app)
-toolbar = DebugToolbarExtension(app=app)
-
-from .models import (
-    Category, Course, Lesson, Tag, 
-    lesson_tag, course_tag, User, Order,
-    Order, OrderDetail, Like, Comment, 
-    Resource, Rating
-)
+def create_app(config_class=DevelopmentConfig):
+    app = Flask(__name__)
+    app.config.from_object(config_class)
+    db.init_app(app=app)
+    cache.init_app(app=app)
+    babel.init_app(app=app)
+    
+    Migrate(app=app, db=db, render_as_batch=False)
+    CORS(app=app, resources={r"/*": {"origins": "*"}})
+    
+    jwt.init_app(app=app)
+    login_manager.init_app(app=app)
+    api.init_app(app=app)
+    admin_manager.init_app(app=app)
+    
+    DebugToolbarExtension(app=app)
+    
+    from .models import (
+        Category, Course, Lesson, Tag, 
+        lesson_tag, course_tag, User, Order,
+        Order, OrderDetail, Like, Comment, 
+        Resource, Rating
+    )
+    
+    return app

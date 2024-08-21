@@ -1,9 +1,12 @@
-from app import app, login_manager, dao, jwt, db
+
+from app import create_app, login_manager, dao, jwt
+from .models import db
 from .admin.views import admin_login
 from flask_login import current_user
 from datetime import datetime, timezone
 
-
+app = create_app()
+            
 @jwt.user_identity_loader
 def user_identity_lookup(user):
     return user.id

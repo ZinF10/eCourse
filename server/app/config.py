@@ -13,7 +13,8 @@ DB_HOST = os.environ.get('DB_HOST')
 DB_NAME = os.environ.get('DB_NAME')
     
 class Config(object):
-    CACHE_TYPE = 'simple'
+    CACHE_TYPE = 'SimpleCache'
+    CACHE_DEFAULT_TIMEOUT = 300
     DEBUG = False
     TESTING = False
     SECRET_KEY = secrets.token_hex(32)
@@ -51,7 +52,7 @@ class DevelopmentConfig(Config):
 
 
 class TestingConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(base_dir, 'database', 'ecourse.sqlite3')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(base_dir, 'database', 'test_ecourse.sqlite3')
     TESTING = True
     DEBUG = True
 

@@ -68,10 +68,16 @@ MAIL_USERNAME=<your_email>
 MAIL_PASSWORD=<your_password>
 ```
 
-Write UnitTest basic
+Run all testcase
 
 ```bash
-python -m unittest app.tests
+python -m unittest discover
+```
+
+CLI create `Admin` user
+
+```bash
+python manage.py create_admin
 ```
 
 ## Author

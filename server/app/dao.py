@@ -1,12 +1,13 @@
 from sqlalchemy import func, extract
 from .config import Config
 from .models import db, Category, User, Course, Lesson
+from .services.caching import cache
 
 
 def fetch_user(id=None):
     return User.query.filter(User.is_active.__eq__(True), User.id.__eq__(id)).first()
 
-
+@cache.memoize(50)
 def load_categories():
     return Category.query.filter(Category.is_active.__eq__(True)).all()
         
