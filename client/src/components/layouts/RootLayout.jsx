@@ -1,15 +1,13 @@
 import { Outlet } from "react-router-dom";
-import Footer from "./Footer"
-import Header from "./Header";
+import Footer from "../ui/organisms/Footer"
+import Header from "../ui/organisms/Header";
 
 const RootLayout = () => {
     return (
         <>
             <Header />
             <main className="container">
-                <article>
-                    <Outlet />
-                </article>
+                <Outlet />
             </main>
             <Footer />
         </>

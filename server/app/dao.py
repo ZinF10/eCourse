@@ -1,6 +1,6 @@
 from sqlalchemy import func, extract
-from .models import db, Category, Course, User, Lesson
-from .configs import Config
+from .config import Config
+from .models import db, Category, User, Course, Lesson
 
 
 def fetch_user(id=None):
@@ -63,12 +63,12 @@ def load_course(course_id):
     return Course.query.get(int(course_id))
 
 
-def load_lessons(course=None, lesson=None):
+def load_lessons(course=None):
     queries = Lesson.query.filter(Lesson.is_active.__eq__(True))
 
     if course:
         queries = queries.filter(Lesson.course_id.__eq__(course))
-        
+
     return queries.all()
 
 

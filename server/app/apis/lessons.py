@@ -1,7 +1,7 @@
 from ..dao import load_lesson
 from flask_restx import Resource
 from flask import abort
-from .serializers import lesson_api, lesson
+from .dto import lesson_api, lesson
 
 @lesson_api.route('/<int:id>/')
 @lesson_api.param('id', 'An ID')

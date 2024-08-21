@@ -74,18 +74,6 @@ Write UnitTest basic
 python -m unittest app.tests
 ```
 
-Run debug server
-
-```bash
-python manage.py --debug run
-```
-
-CLI create `Admin` user
-
-```bash
-python manage.py create_admin
-```
-
 ## Author
 
 Copyright &copy; 2024 by [ZIN](http://www.github.com/zinitdev)

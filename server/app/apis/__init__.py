@@ -4,7 +4,7 @@ from .coures import course_api
 from .lessons import lesson_api
 from .users import user_api
 from .token import token_api
-from ..configs import Config
+from ..config import Config
 
 authorizations = {
     'jwt': {

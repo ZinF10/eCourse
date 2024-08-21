@@ -2,13 +2,14 @@ from flask_jwt_extended import create_access_token, create_refresh_token
 from flask_restx import Resource
 from flask import jsonify
 from datetime import datetime, timezone
-from .serializers import token_api, login_model
+from .dto import token_api, login_model
 from ..dao import auth_user
 
 @token_api.route('/')
 class TokenResource(Resource):
     @token_api.expect(login_model)
     def post(self):
+        """ Get access token """
         user = auth_user(email=token_api.payload['email'], password=token_api.payload['password'])
         if not user:
             return jsonify(message='Invalid email or password'), 401

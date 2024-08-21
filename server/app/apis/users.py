@@ -1,7 +1,7 @@
 from flask_restx import Resource
 from flask_jwt_extended import jwt_required, current_user
 from ..dao import fetch_user, create_user
-from .serializers import user_parser, user_api, user
+from .dto import user_parser, user_api, user, current_user_respone
 from ..utils.helpers import upload_image
 
 @user_api.route('/')
@@ -9,6 +9,7 @@ class UserResource(Resource):
     @user_api.expect(user_parser)
     @user_api.marshal_with(user, code=201)
     def post(self):
+        """ Create user account """
         avatar_url = None
         args = user_parser.parse_args()
         avatar = args['avatar']
@@ -25,7 +26,6 @@ class UserResource(Resource):
             avatar=avatar_url,
             phone=args['phone']
         )
-        # send_email(to=new_user.email, subject="Thank", content="hello")
         return new_user
     
     
@@ -33,7 +33,7 @@ class UserResource(Resource):
 class CurrentUserResource(Resource):
     method_decorators = [jwt_required()]
     @user_api.doc(security="jwt")
-    @user_api.marshal_with(user, code=200)
+    @user_api.marshal_with(current_user_respone, code=200)
     def get(self):
+        """ Get current user """
         return fetch_user(current_user.id)
-

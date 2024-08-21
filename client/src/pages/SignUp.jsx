@@ -4,7 +4,7 @@ import httpClient from '@/services/client';
 import endpoints from '@/services/endpoints';
 import { registerSchema } from '@/utils/schemas'
 
-const Register = () => {
+const SignUp = () => {
 	const {
 		register,
 		handleSubmit,
@@ -36,16 +36,15 @@ const Register = () => {
 					},
 				},
 			);
-			console.log(response.data);
-			alert('Registration successful');
+			response.data && navigate('/login')
 		} catch (error) {
 			console.error(error);
-			alert('Registration failed');
 		}
 	};
+
 	return (
 		<section>
-			<h2>Register</h2>
+			<h2>Sign Up</h2>
 			<form onSubmit={handleSubmit(onSubmit)}>
 				<div className='form-group'>
 					<label>Username</label>
@@ -149,9 +148,9 @@ const Register = () => {
 						</span>
 					)}
 				</div>
-				<button type='submit'>Register</button>
+				<button type='submit'>Sign Up</button>
 			</form>
 		</section>
 	);
 };
-export default Register;
+export default SignUp;

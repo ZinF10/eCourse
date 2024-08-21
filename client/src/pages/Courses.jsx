@@ -1,9 +1,10 @@
-import CourseList from "@/components/containers/CourseList"
+import Title from "@/components/ui/atoms/Title"
+import CourseList from "@/components/ui/organisms/CourseList"
 
 const Courses = () => {
     return (
         <section className="py-2">
-            <h2>Courses</h2>
+            <Title>Courses</Title>
             <CourseList />
         </section>
     )

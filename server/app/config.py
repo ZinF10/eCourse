@@ -13,6 +13,7 @@ DB_HOST = os.environ.get('DB_HOST')
 DB_NAME = os.environ.get('DB_NAME')
     
 class Config(object):
+    CACHE_TYPE = 'simple'
     DEBUG = False
     TESTING = False
     SECRET_KEY = secrets.token_hex(32)
@@ -37,9 +38,10 @@ class Config(object):
         api_key=os.environ.get('API_KEY'),
         api_secret=os.environ.get('API_SECRET')
     )
+    
 
 class DevelopmentConfig(Config):
-    SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}?charset=utf8mb4'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(base_dir, 'database', 'ecourse.sqlite3')
     DEVELOPMENT = True
     DEBUG = True
     DEBUG_TB_ENABLED = True
@@ -57,3 +59,4 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     DEBUG = False
     DEBUG_TB_ENABLED = False
+    SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}?charset=utf8mb4'

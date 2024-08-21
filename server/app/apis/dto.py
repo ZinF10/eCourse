@@ -1,11 +1,14 @@
-from flask_restx import Namespace, fields, reqparse
+""" Data Transfer Object """
+"""Parsers and serializers for models API endpoints."""
+
+from flask_restx import Namespace, fields, reqparse, Model
 from werkzeug.datastructures import FileStorage
 
-category_api = Namespace('categories', description='Category operations', ordered=True)
-course_api = Namespace('courses', description='Course operations', ordered=True)
-lesson_api = Namespace('lessons', description='Lesson operations', ordered=True)
-user_api = Namespace('users', description='User operations', ordered=True)
-token_api = Namespace('token', description='Token operations', ordered=True)
+category_api = Namespace('categories', description='Categories', ordered=True, validate=True)
+course_api = Namespace('courses', description='Courses', ordered=True, validate=True)
+lesson_api = Namespace('lessons', description='Lessons', ordered=True, validate=True)
+user_api = Namespace('users', description='Users', ordered=True, validate=True)
+token_api = Namespace('token', description='Token', ordered=True, validate=True)
 
 base_model = category_api.model('Base Model', {
     'id': fields.Integer(readonly=True, description='Unique ID'),
@@ -45,15 +48,20 @@ login_model = token_api.model('Log In', {
     'password': fields.String(required=True)
 })
 
-user = user_api.inherit('User', login_model, {
+user_register = user_api.model('Register', {
     'username': fields.String(required=True),
+    'email': fields.String(required=True),
     'first_name': fields.String(required=True),
     'last_name': fields.String(required=True),
     'avatar': fields.String(required=False),
     'phone': fields.String(required=False)
 })
 
-current_user = user_api.inherit('Current User', user, {
+user = user_api.model('User', user_register, {
+    'password': fields.String(required=True),
+})
+
+current_user_respone = user_api.inherit('Current User', user_register, {
     'last_seen': fields.String(required=False)
 })
 
@@ -66,7 +74,7 @@ user_parser.add_argument('last_name', type=str, help='Last Name', location='form
 user_parser.add_argument('phone', type=int, help='Phone', location='form')
 user_parser.add_argument('avatar', type=FileStorage, location='files')
 
-course_parser = reqparse.RequestParser()
+course_parser = reqparse.RequestParser(bundle_errors=True)
 course_parser.add_argument('category', type=int, required=False, help='Category ID')
 course_parser.add_argument('keyword', type=str, required=False, help='Search keyword')
 course_parser.add_argument('from_price', type=float, required=False, help='Minimum price')

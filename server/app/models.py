@@ -1,5 +1,4 @@
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 from sqlalchemy import Column, Integer, Boolean, DateTime, String, ForeignKey, Text, Float, Enum
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin
@@ -8,7 +7,6 @@ from flask_bcrypt import generate_password_hash, check_password_hash
 from .utils.helpers import hash_avatar_url
 
 db = SQLAlchemy()
-migrate = Migrate()
 class BaseModel(db.Model):
     __abstract__ = True
 
@@ -207,4 +205,3 @@ class Like(InteractionModel):
 
     def __str__(self):
         return self.is_liked
-

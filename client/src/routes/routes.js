@@ -8,7 +8,7 @@ const SignUp = lazy(() => import('@/pages/SignUp'));
 const LogIn = lazy(() => import('@/pages/LogIn'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const Cart = lazy(() => import('@/pages/Cart'));
-const NoMatch = lazy(() => import('@/pages/NoMatch'));
+const NotFound = lazy(() => import('@/pages/NotFound'));
 
 const PublicRoutes = [
     { path: '/', component: Home },
@@ -18,7 +18,7 @@ const PublicRoutes = [
     { path: '/sign-up', component: SignUp },
     { path: '/login', component: LogIn },
     { path: '/cart', component: Cart },
-    { path: '*', component: NoMatch },
+    { path: '*', component: NotFound },
 ];
 
 const PrivateRoutes = [

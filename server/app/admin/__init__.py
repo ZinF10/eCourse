@@ -1,10 +1,11 @@
 from flask_admin import Admin
 from flask_babel import Babel
-from ..configs import file_path, Config
+from ..config import file_path, Config
 from ..models import db, Category, Course, Lesson, Tag, User
 from .admin import (
-    AdminView, CategoryAdmin, AnalyticsAdmin, CourseAdmin, UserAdmin,
-    LessonAdmin, TagAdmin, LogoutView, UploadFileView, ProfileView
+    AdminView, CategoryAdmin, CourseAdmin, UserAdmin,
+    LessonAdmin, TagAdmin, UploadFileView, ProfileView,
+    LogoutView, AnalyticsAdmin
 )
 from ..utils.helpers import get_locale
 

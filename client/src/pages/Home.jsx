@@ -1,5 +1,5 @@
-import Hero from "@/components/common/Hero"
-import CourseList from "@/components/containers/CourseList"
+import Hero from "@/components/ui/organisms/Hero"
+import CourseList from "@/components/ui/organisms/CourseList"
 import { Card, Col, Row } from "react-bootstrap"
 import { Link } from "react-router-dom"
 
@@ -11,7 +11,7 @@ const Home = () => {
             </section>
             <hr className='divider py-2'></hr>
             <section className="py-2" aria-labelledby="featured-courses">
-                <h2 id="featured-courses">Latest Courses</h2>
+                <h2 id="featured-courses" className="h2">Latest Courses</h2>
                 <CourseList isNew="true" />
             </section>
             <hr className='divider py-2'></hr>

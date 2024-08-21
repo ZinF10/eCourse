@@ -1,7 +1,7 @@
 from flask_restx import Resource
 from flask import abort
 from ..dao import load_courses, load_course, load_lessons
-from .serializers import course_api, courses, course, course_parser, lessons
+from .dto import course_api, courses, course, course_parser, lessons
 
 
 @course_api.route('/')

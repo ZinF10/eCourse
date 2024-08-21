@@ -1,6 +1,7 @@
 import { Button, Col, Container, Form, Row } from "react-bootstrap"
-import { Link, NavLink } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { CiFacebook, CiInstagram, CiTwitter } from "react-icons/ci";
+import Logo from "../molecules/Logo";
 
 const Footer = () => {
     return (
@@ -8,9 +9,7 @@ const Footer = () => {
             <Container>
                 <Row>
                     <Col xs={12} md={4} className="mb-3">
-                        <NavLink to={"/"} className="navbar-brand fw-bold fs-3 d-flex align-items-center mb-3 link-body-emphasis text-decoration-none">
-                            eCourse 🎓
-                        </NavLink>
+                        <Logo type="navbar-brand fw-bold fs-3 d-flex align-items-center mb-3 link-body-emphasis text-decoration-none" />
                         <p className='text-body-tertiary' style={{ textAlign: 'justify' }}><strong className="text-dark">eCourse</strong> is a leading online learning platform with thousands of high-quality courses. We are committed to providing the best learning experience for our students.</p>
                     </Col>
 
@@ -18,13 +17,13 @@ const Footer = () => {
                         <h5>eCourse 🎓</h5>
                         <ul className="nav flex-column">
                             <li className="nav-item mb-2">
-                                <NavLink className='nav-link p-0 text-body-secondary' to={'/'}>Home</NavLink>
+                                <Link className='nav-link p-0 text-body-secondary' to={'/'}>Home</Link>
                             </li>
                             <li className="nav-item mb-2">
-                                <NavLink className='nav-link p-0 text-body-secondary' to={'/courses'}>Courses</NavLink>
+                                <Link className='nav-link p-0 text-body-secondary' to={'/courses'}>Courses</Link>
                             </li>
                             <li className="nav-item mb-2">
-                                <NavLink className='nav-link p-0 text-body-secondary' to={'/about'}>About</NavLink>
+                                <Link className='nav-link p-0 text-body-secondary' to={'/about'}>About</Link>
                             </li>
                         </ul>
                     </Col>

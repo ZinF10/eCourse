@@ -7,7 +7,7 @@ from flask_admin.form import SecureForm
 from wtforms import FileField
 from flask_login import current_user, logout_user
 from markupsafe import Markup
-from ..configs import DevelopmentConfig
+from ..config import DevelopmentConfig
 from ..dao import stats_courses, count_courses
 from ..utils.decorators import admin_member_required
 from .widgets import CKTextAreaField
